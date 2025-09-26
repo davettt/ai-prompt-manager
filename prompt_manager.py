@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AI Prompt Manager V2
+AI Prompt Manager
 Streamlined prompt storage and retrieval with intelligent metadata extraction
 """
 
@@ -23,7 +23,7 @@ class PromptManager:
     
     def add_prompt(self):
         """Add a new prompt with intelligent metadata extraction"""
-        display_header("Add New Prompt - V2")
+        display_header("Add New Prompt")
         
         print("Paste your complete, optimized prompt below.")
         print("When finished, enter 'END' on a new line:")
@@ -539,7 +539,7 @@ def main():
     """Main application entry point"""
     manager = PromptManager()
     
-    display_header("AI Prompt Manager V2")
+    display_header("AI Prompt Manager")
     print("Streamlined prompt storage with intelligent metadata extraction")
     
     while True:

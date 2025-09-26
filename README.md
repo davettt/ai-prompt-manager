@@ -1,10 +1,10 @@
-# AI Prompt Manager V2
+# AI Prompt Manager
 
 A streamlined, intelligent prompt storage and retrieval system that focuses on preserving your carefully crafted prompts while providing smart organization and metadata extraction.
 
 ## Philosophy
 
-This v2 system takes a fundamentally different approach:
+This system takes a fundamentally different approach:
 - **Quality First**: Add only your complete, optimized prompts
 - **Preservation**: Never modify your prompt content 
 - **Intelligence**: Let Claude analyze and categorize your prompts
@@ -15,7 +15,7 @@ This v2 system takes a fundamentally different approach:
 
 1. **Setup**:
    ```bash
-   cd ai-prompt-manager-v2
+   cd ai-prompt-manager
    pip install -r requirements.txt
    cp .env.example .env  # Add your ANTHROPIC_API_KEY
    ```
@@ -105,11 +105,11 @@ Each prompt includes:
 - **Content preservation** - no AI modification of your prompt content
 - **Intelligent privacy analysis** - Claude suggests public/private based on content
 
-## Migration from V1
+## Migration from Previous Versions
 
-V2 is a fresh start designed for professional-grade prompts. The old v1 system focused on XML transformation and improvement workflows that proved problematic for complex prompts.
+This system is designed for professional-grade prompts with a focus on content preservation. Previous versions focused on XML transformation and improvement workflows that proved problematic for complex prompts.
 
-Key differences:
+Key improvements:
 - ❌ No more XML forcing or content modification
 - ❌ No more "improvement" workflows that lose content
 - ✅ Intelligent metadata extraction without content changes
