@@ -125,4 +125,36 @@ The system is built with simplicity and reliability in mind:
 - **Privacy protection**: Multiple layers preventing private content leaks
 - **Extensible**: Easy to add new features without complexity
 
+## Contributing
+
+This project is open source under MIT license. You're welcome to:
+- **Fork the repository** and customize for your needs
+- **Report bugs** via GitHub issues
+- **Suggest improvements** in discussions
+
+*Note: This is a personal productivity system. While the code is open source, I keep contributions minimal to maintain system stability.*
+
+### Areas for Enhancement
+- **Favorites system** - Quick access to most-used prompts
+- **Enhanced search** - Advanced filtering and discovery
+- **Export/import** - Sharing prompt collections
+- **Usage analytics** - Track prompt effectiveness
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+⚠️  **Important:** This software is provided "as is" without warranty. Users are responsible for:
+- Securing their API tokens and personal data
+- Testing the system with non-critical prompts first
+- Understanding the privacy implications of public vs private prompts
+- Regular backups of important prompt data
+
+**Use at your own risk.** The author is not responsible for any data loss, API quota exhaustion, or unintended prompt modifications.
+
+## Acknowledgments
+
+- Built using patterns from [python-automation-template](https://github.com/davettt/python-automation-template)
+- Powered by Claude API for intelligent metadata extraction
+
 Ready to store and organize your professional prompt library!
