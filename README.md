@@ -154,7 +154,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Acknowledgments
 
-- Built using patterns from [python-automation-template](https://github.com/davettt/python-automation-template)
+- Built using established Python automation patterns
 - Powered by Claude API for intelligent metadata extraction
 
 Ready to store and organize your professional prompt library!
