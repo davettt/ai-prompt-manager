@@ -82,7 +82,7 @@ class PromptManager:
         
         return {
             'id': prompt_id,
-            'title': metadata.get('title', 'Untitled Prompt'),
+            'title': metadata.get('title') or metadata.get('ai_suggested_title', 'Untitled Prompt'),
             'content': content,
             'category': metadata.get('ai_suggested_category', 'general'),
             'tags': metadata.get('ai_suggested_tags', []),
@@ -91,6 +91,7 @@ class PromptManager:
             'created': datetime.now().isoformat(),
             'last_used': None,
             'usage_count': 0,
+            'discovery': metadata.get('discovery', {}),
             'technical_notes': {
                 'recommended_llm': metadata.get('recommended_llm'),
                 'temperature': metadata.get('temperature'),

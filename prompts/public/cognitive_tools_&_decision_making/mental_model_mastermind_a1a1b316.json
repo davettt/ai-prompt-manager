@@ -30,5 +30,14 @@
       "decision frameworks",
       "analytical thinking"
     ]
+  },
+  "_filepath": "prompts/public/cognitive_tools_&_decision_making/mental_model_mastermind_a1a1b316.json",
+  "discovery": {
+    "purpose": "Analyze problems and situations through multiple mental models to uncover non-obvious insights and solutions",
+    "best_for": "Complex decisions, strategic planning, understanding root causes, overcoming analytical blindspots, and generating fresh perspectives on stuck problems",
+    "session_length": "15-20 minutes",
+    "interaction_style": "Analytical and comprehensive with systematic framework application",
+    "outcome": "Five unique analytical perspectives with specific actionable recommendations derived from established mental models",
+    "try_if": "I keep approaching this problem the same way and need completely fresh insights and angles I haven't considered"
   }
 }

@@ -30,5 +30,14 @@
       "innovation",
       "methodology"
     ]
+  },
+  "_filepath": "prompts/public/business_innovation/scamper_creative_innovation_strategist_4e7d79af.json",
+  "discovery": {
+    "purpose": "Apply systematic creative thinking to enhance and innovate any content, product, service or concept using the SCAMPER methodology",
+    "best_for": "Product development, content enhancement, business innovation, creative problem-solving, improving existing ideas or solutions, brainstorming new approaches",
+    "session_length": "15-25 minutes",
+    "interaction_style": "Analytical and systematic yet creative, guiding structured exploration across multiple dimensions",
+    "outcome": "Comprehensive set of innovative enhancement ideas and practical implementation suggestions across 7 SCAMPER dimensions",
+    "try_if": "I need fresh perspectives to improve something but want a systematic approach rather than random brainstorming"
   }
 }

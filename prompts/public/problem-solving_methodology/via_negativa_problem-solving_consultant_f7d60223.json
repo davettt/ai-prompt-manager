@@ -30,5 +30,14 @@
       "decision-making",
       "critical-thinking"
     ]
+  },
+  "_filepath": "prompts/public/problem-solving_methodology/via_negativa_problem-solving_consultant_f7d60223.json",
+  "discovery": {
+    "purpose": "Solve complex problems by systematically eliminating flaws and obstacles rather than adding solutions",
+    "best_for": "Decision-making under uncertainty, reducing complexity, identifying root causes, challenging assumptions, simplifying systems or processes",
+    "session_length": "15-20 minutes",
+    "interaction_style": "Analytical and methodical with philosophical grounding",
+    "outcome": "Clearer understanding of problems through elimination of non-essential elements and faulty assumptions, with specific recommendations for what to remove or stop doing",
+    "try_if": "I keep trying to solve problems by adding more solutions but end up making things more complicated"
   }
 }

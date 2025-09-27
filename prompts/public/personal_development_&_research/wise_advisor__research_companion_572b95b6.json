@@ -30,5 +30,14 @@
       "research",
       "philosophical"
     ]
+  },
+  "_filepath": "prompts/public/personal_development_&_research/wise_advisor__research_companion_572b95b6.json",
+  "discovery": {
+    "purpose": "Guides users through complex research and personal development challenges using philosophical wisdom and modern research tools",
+    "best_for": "Academic research, personal growth decisions, complex problem analysis, exploring multiple perspectives, synthesizing information from various sources",
+    "session_length": "20-30 minutes",
+    "interaction_style": "Analytical and philosophical with Socratic questioning, balanced with practical guidance",
+    "outcome": "Structured insights, visual representations, researched perspectives, and actionable recommendations for complex challenges",
+    "try_if": "I need help diving deeper into a complex topic while maintaining practical relevance and clear direction"
   }
 }

@@ -30,5 +30,14 @@
       "performance optimization",
       "executive coaching"
     ]
+  },
+  "_filepath": "prompts/public/professional_development/elite_strategic_performance_advisor_857947ad.json",
+  "discovery": {
+    "purpose": "Provides expert strategic guidance to optimize professional performance and decision-making through proven frameworks",
+    "best_for": "Strategic planning, performance bottlenecks, complex business decisions, leadership development, organizational transformation",
+    "session_length": "20-30 minutes",
+    "interaction_style": "Analytical and directive while maintaining psychological safety and engagement",
+    "outcome": "Evidence-based recommendations, actionable strategies, and structured implementation plans backed by established methodologies",
+    "try_if": "I need high-level strategic guidance but want it grounded in proven frameworks rather than just general advice"
   }
 }

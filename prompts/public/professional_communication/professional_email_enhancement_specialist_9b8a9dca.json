@@ -30,5 +30,14 @@
       "business writing",
       "communication optimization"
     ]
+  },
+  "_filepath": "prompts/public/professional_communication/professional_email_enhancement_specialist_9b8a9dca.json",
+  "discovery": {
+    "purpose": "Analyzes and enhances professional email drafts for maximum clarity, impact, and response rates",
+    "best_for": "Important business emails, client communications, internal announcements, sales outreach, and sensitive professional messages",
+    "session_length": "15-20 minutes per email analysis",
+    "interaction_style": "Analytical and systematic with specific, actionable recommendations",
+    "outcome": "Optimized email draft with improved clarity, professionalism, and effectiveness plus specific enhancement recommendations",
+    "try_if": "I need to make sure this critical email hits the right tone and gets the response I'm looking for"
   }
 }

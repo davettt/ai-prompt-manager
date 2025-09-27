@@ -30,5 +30,14 @@
       "business development",
       "service design"
     ]
+  },
+  "_filepath": "prompts/public/business_strategy/freelance_business_development_strategist_b0013a7f.json",
+  "discovery": {
+    "purpose": "Generate and validate new service offerings and business opportunities for freelancers through strategic market analysis",
+    "best_for": "Freelancers looking to expand their services, validate business ideas, or develop new revenue streams with market-backed strategies",
+    "session_length": "20-30 minutes",
+    "interaction_style": "Analytical and comprehensive with a focus on actionable recommendations",
+    "outcome": "Market-validated service concepts, pricing strategies, implementation plans, and supporting research data",
+    "try_if": "I want to expand my freelance business but need help identifying and validating profitable opportunities"
   }
 }

@@ -305,20 +305,29 @@ def extract_technical_notes(content):
     return technical_data
 
 def analyze_prompt_with_claude(content):
-    """Use Claude to analyze prompt and suggest metadata"""
+    """Use Claude to analyze prompt and suggest metadata including discovery info"""
     
-    analysis_prompt = f"""Analyze this prompt and provide metadata suggestions in JSON format:
+    analysis_prompt = f"""Analyze this prompt and provide comprehensive metadata in JSON format:
 
 {content[:2000]}{'...' if len(content) > 2000 else ''}
 
 Provide your analysis as a JSON object with these fields:
 {{
+  "title": "3-5 word professional title capturing the main role",
   "category": "suggested category (be specific, e.g., 'Business Strategy', 'Creative Writing', 'Personal Development')",
   "tags": ["2-3", "relevant", "tags"],
   "privacy_recommendation": "public or private",
   "privacy_reasoning": "brief explanation for privacy recommendation",
   "complexity_level": "basic, intermediate, or advanced",
-  "use_case": "brief description of main use case"
+  "use_case": "brief description of main use case",
+  "discovery": {{
+    "purpose": "One clear sentence: What does this prompt help accomplish?",
+    "best_for": "Specific situations, problems, or use cases this addresses",
+    "session_length": "Estimated time for typical session (e.g. '10-15 minutes')",
+    "interaction_style": "Communication approach (e.g. 'Direct but supportive')",
+    "outcome": "What the user gets from using this prompt",
+    "try_if": "One compelling reason to try this prompt, in quotes"
+  }}
 }}
 
 IMPORTANT: Privacy should be based on the PROMPT CONTENT itself, not how it might be used:
@@ -344,6 +353,14 @@ Examples:
 - **PRIVATE: Any prompt describing specific user traits, challenges, or personality profile**
 
 Key principle: If the prompt reveals personal information about its creator/user, it should be PRIVATE.
+
+Discovery examples:
+- purpose: "Build proactive thinking and overcome limiting beliefs"
+- best_for: "Feeling stuck, making excuses, procrastination, or avoiding action"
+- session_length: "10-15 minutes"
+- interaction_style: "Direct but supportive with evidence-based frameworks"
+- outcome: "Specific action plan with accountability measures"
+- try_if: "I know what I should do but keep procrastinating"
 
 Respond ONLY with the JSON object, no other text."""
 
@@ -382,15 +399,22 @@ def extract_all_metadata(content):
     technical_data = extract_technical_notes(content)
     metadata.update(technical_data)
     
-    # Get Claude's analysis
+    # Get Claude's analysis (includes discovery info now)
     claude_analysis = analyze_prompt_with_claude(content)
     if claude_analysis:
+        # Map Claude response fields to metadata
+        metadata['ai_suggested_title'] = claude_analysis.get('title')
         metadata['ai_suggested_category'] = claude_analysis.get('category')
         metadata['ai_suggested_tags'] = claude_analysis.get('tags', [])
         metadata['ai_privacy_recommendation'] = claude_analysis.get('privacy_recommendation')
         metadata['ai_privacy_reasoning'] = claude_analysis.get('privacy_reasoning')
         metadata['complexity_level'] = claude_analysis.get('complexity_level')
         metadata['use_case'] = claude_analysis.get('use_case')
+        metadata['discovery'] = claude_analysis.get('discovery', {})
+        
+        # Use Claude's title if we don't have one from extraction
+        if not metadata.get('title') and claude_analysis.get('title'):
+            metadata['title'] = claude_analysis['title']
     
     return metadata
 

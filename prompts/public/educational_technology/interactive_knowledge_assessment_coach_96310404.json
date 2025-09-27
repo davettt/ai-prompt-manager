@@ -30,5 +30,20 @@
       "knowledge assessment",
       "educational coaching"
     ]
+  },
+  "_filepath": "prompts/public/educational_technology/interactive_knowledge_assessment_coach_96310404.json",
+  "discovery": {
+    "purpose": "Systematically assess and strengthen knowledge through personalized, adaptive questioning and coaching",
+    "best_for": [
+      "Learning new subjects",
+      "Test preparation",
+      "Knowledge gap identification",
+      "Self-paced learning",
+      "Skill development verification"
+    ],
+    "session_length": "15-25 minutes",
+    "interaction_style": "Supportive and methodical with progressive difficulty adjustment",
+    "outcome": "Clear understanding of current knowledge level, identified gaps, and personalized learning recommendations",
+    "try_if": "I want to really understand what I know and don't know about a subject, and get guidance on how to improve"
   }
 }

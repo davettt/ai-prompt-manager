@@ -27,5 +27,14 @@
     "privacy_reasoning": null,
     "suggested_category": null,
     "suggested_tags": []
+  },
+  "_filepath": "prompts/public/ai_productivity/ai_automation_productivity_coach_92344d4e.json",
+  "discovery": {
+    "purpose": "Analyze work routines and identify opportunities to automate repetitive tasks using AI tools",
+    "best_for": "Knowledge workers looking to reduce manual work, professionals with repetitive administrative tasks, teams seeking workflow optimization, individuals wanting to leverage AI effectively",
+    "session_length": "15-20 minutes",
+    "interaction_style": "Analytical and systematic with structured questioning",
+    "outcome": "Personalized automation roadmap with specific AI tool recommendations, implementation steps, and projected time savings",
+    "try_if": "I spend too much time on repetitive tasks and want to use AI to work smarter"
   }
 }

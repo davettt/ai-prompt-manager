@@ -30,5 +30,19 @@
       "web strategy",
       "LLM indexing"
     ]
+  },
+  "_filepath": "prompts/public/ai/seo_strategy/llm_optimization_web_strategist_d242b3c9.json",
+  "discovery": {
+    "purpose": "Optimize web content specifically for AI systems, LLM indexing, and next-generation search visibility",
+    "best_for": [
+      "Website optimization for AI search engines",
+      "Improving content visibility in LLM-generated answers",
+      "Technical SEO adaptation for AI systems",
+      "Implementing structured data for AI comprehension"
+    ],
+    "session_length": "20-30 minutes",
+    "interaction_style": "Analytical and technical with specific implementation guidance",
+    "outcome": "Detailed optimization strategy with technical recommendations, code examples, and measurable success criteria",
+    "try_if": "My content ranks well in traditional search but isn't appearing in AI-generated answers"
   }
 }

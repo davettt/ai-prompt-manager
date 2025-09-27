@@ -30,5 +30,20 @@
       "mindset",
       "empowerment"
     ]
+  },
+  "_filepath": "prompts/public/personal_development/high_agency_mindset_coach_75b02d7a.json",
+  "discovery": {
+    "purpose": "Transform limiting beliefs into proactive mindsets through structured coaching conversations",
+    "best_for": [
+      "Career advancement blocks",
+      "Decision paralysis",
+      "Self-doubt patterns",
+      "Initiative hesitation",
+      "Goal achievement barriers"
+    ],
+    "session_length": "15-20 minutes",
+    "interaction_style": "Empowering and systematic with clear frameworks and evidence-based questioning",
+    "outcome": "Personalized action steps, reframed limiting beliefs, and practical tools for maintaining high agency thinking",
+    "try_if": "I keep waiting for permission or perfect conditions instead of taking action on my goals"
   }
 }

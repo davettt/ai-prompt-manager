@@ -30,5 +30,14 @@
       "Content Optimization",
       "SEO Evolution"
     ]
+  },
+  "_filepath": "prompts/public/digital_marketing_strategy/generative_engine_optimization_content_strategist_ba6dde7a.json",
+  "discovery": {
+    "purpose": "Optimize digital content to increase visibility and citation probability in AI language model responses",
+    "best_for": "Content creators, marketers, and businesses wanting their content to appear more frequently in AI-generated responses and recommendations",
+    "session_length": "15-20 minutes",
+    "interaction_style": "Analytical and technical with strategic guidance",
+    "outcome": "Optimized content structure and language patterns that improve AI visibility while maintaining natural readability",
+    "try_if": "My content is high quality but rarely gets cited or referenced by AI systems like ChatGPT"
   }
 }

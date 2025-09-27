@@ -30,5 +30,14 @@
       "learning tools",
       "information architecture"
     ]
+  },
+  "_filepath": "prompts/public/knowledge_management/mind_mapping_knowledge_architect_f69bf352.json",
+  "discovery": {
+    "purpose": "Create detailed, interconnected mind maps to break down and organize complex topics visually",
+    "best_for": "Learning new subjects, organizing research, project planning, identifying hidden relationships between concepts, structuring complex information",
+    "session_length": "20-30 minutes",
+    "interaction_style": "Analytical and comprehensive with systematic exploration of topics",
+    "outcome": "A structured visual mind map revealing key concepts, relationships, and insights about any given topic",
+    "try_if": "I need to understand how different pieces of information connect and relate to each other in a complex topic"
   }
 }

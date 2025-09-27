@@ -30,5 +30,14 @@
       "creative methodology",
       "innovation framework"
     ]
+  },
+  "_filepath": "prompts/public/creative_innovation/creative_fusion_innovation_engine_8068a698.json",
+  "discovery": {
+    "purpose": "Transform random inputs into innovative ideas and solutions using structured creative thinking frameworks",
+    "best_for": "Brainstorming sessions, product development, problem-solving challenges, business innovation, creative blocks, generating unique concepts",
+    "session_length": "15-25 minutes",
+    "interaction_style": "Analytical and creative, combining structured methodology with explorative thinking",
+    "outcome": "Novel, actionable ideas with clear understanding of the creative process used to generate them",
+    "try_if": "I need fresh perspectives and innovative solutions but want a systematic approach rather than random brainstorming"
   }
 }
