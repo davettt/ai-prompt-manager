@@ -19,13 +19,22 @@ def ensure_directory_exists(path):
         return False
 
 def generate_safe_filename(title, prompt_id=None):
-    """Generate a safe filename from title"""
+    """Generate a safe filename from title with length protection"""
     if not prompt_id:
         prompt_id = str(uuid.uuid4())[:8]
     
     # Clean title for filename
     safe_title = "".join(c for c in title if c.isalnum() or c in (' ', '-', '_')).strip()
     safe_title = safe_title.replace(' ', '_').lower()
+    
+    # Limit title length to prevent filesystem issues
+    # Reserve space for prompt_id (8 chars) + underscore + .json (5 chars) = 14 chars
+    # Keep total filename under 200 characters to be safe across filesystems
+    max_title_length = 180
+    
+    if len(safe_title) > max_title_length:
+        # Take first part and add ellipsis indicator
+        safe_title = safe_title[:max_title_length].rstrip('_')
     
     return f"{safe_title}_{prompt_id}.json"
 

@@ -536,37 +536,45 @@ class PromptManager:
                 self._show_detailed_prompt(matches[idx][0])
 
 def main():
-    """Main application entry point"""
-    manager = PromptManager()
-    
-    display_header("AI Prompt Manager")
-    print("Streamlined prompt storage with intelligent metadata extraction")
-    
-    while True:
-        print("\nOptions:")
-        print("[1] Add new prompt")
-        print("[2] List all prompts")
-        print("[3] Search prompts")
-        print("[4] Exit")
+    """Main application entry point with enhanced error handling"""
+    try:
+        manager = PromptManager()
         
-        try:
-            choice = input("\nSelect option [1-4]: ").strip()
+        display_header("AI Prompt Manager")
+        print("Streamlined prompt storage with intelligent metadata extraction")
+        
+        while True:
+            print("\nOptions:")
+            print("[1] Add new prompt")
+            print("[2] List all prompts")
+            print("[3] Search prompts")
+            print("[4] Exit")
             
-            if choice == '1':
-                manager.add_prompt()
-            elif choice == '2':
-                manager.list_prompts()
-            elif choice == '3':
-                manager.search_prompts()
-            elif choice == '4':
-                print_status("Goodbye!", "success")
-                break
-            else:
-                print_status("Invalid choice. Please select 1-4.", "error")
+            try:
+                choice = input("\nSelect option [1-4]: ").strip()
                 
-        except KeyboardInterrupt:
-            print_status("\nGoodbye!", "success")
-            break
+                if choice == '1':
+                    manager.add_prompt()
+                elif choice == '2':
+                    manager.list_prompts()
+                elif choice == '3':
+                    manager.search_prompts()
+                elif choice == '4':
+                    print_status("Thanks for using AI Prompt Manager! 👋", "success")
+                    break
+                else:
+                    print_status("Invalid choice. Please select 1-4.", "error")
+                    
+            except KeyboardInterrupt:
+                print_status("\nThanks for using AI Prompt Manager! 👋", "success")
+                break
+            except Exception as e:
+                print_status(f"Error during operation: {e}", "error")
+                print("ℹ️  Please try again or report this issue")
+                
+    except Exception as e:
+        print_status(f"Failed to initialize AI Prompt Manager: {e}", "error")
+        print("ℹ️  Check your configuration and try again")
 
 if __name__ == "__main__":
     main()

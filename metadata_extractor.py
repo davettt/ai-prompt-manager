@@ -51,24 +51,18 @@ def call_claude_api(messages, max_tokens=1000):
 
 def extract_title(content):
     """Extract title from prompt content with intelligent fallbacks"""
-    lines = content.strip().split('\n')
     
-    # Method 1: Look for markdown heading
+    # Method 1: Use Claude API for intelligent title generation (PRIMARY)
+    intelligent_title = generate_title_with_claude(content)
+    if intelligent_title:
+        return intelligent_title
+    
+    # Method 2: Look for explicit markdown heading
+    lines = content.strip().split('\n')
     for line in lines[:5]:  # Check first 5 lines
         line = line.strip()
         if line.startswith('# '):
             return line[2:].strip()
-    
-    # Method 2: Look for "You are a/an..." patterns
-    for line in lines[:5]:
-        line = line.strip()
-        if line.lower().startswith('you are a ') or line.lower().startswith('you are an '):
-            # Extract the role/title
-            title = line[10:].strip() if line.lower().startswith('you are an ') else line[9:].strip()
-            # Clean up common endings
-            if title.endswith('.'):
-                title = title[:-1]
-            return title.title()
     
     # Method 3: Look for JSON-style purpose field
     try:
@@ -78,7 +72,6 @@ def extract_title(content):
         
         if 'purpose' in json_content:
             purpose = json_content['purpose']
-            # Extract key concept from purpose
             return generate_title_from_purpose(purpose)
         
         if 'role_definition' in json_content:
@@ -105,12 +98,29 @@ def extract_title(content):
             purpose_text = match.group(1) if len(match.groups()) >= 1 else match.group(0)
             return generate_title_from_purpose(purpose_text)
     
-    # Method 5: Use Claude API for intelligent title generation
-    intelligent_title = generate_title_with_claude(content)
-    if intelligent_title:
-        return intelligent_title
+    # Method 5: Parse "You are a/an..." patterns (FALLBACK)
+    for line in lines[:5]:
+        line = line.strip()
+        if line.lower().startswith('you are a ') or line.lower().startswith('you are an '):
+            # Extract the role/title
+            title = line[10:].strip() if line.lower().startswith('you are an ') else line[9:].strip()
+            
+            # Stop at first sentence or reasonable length
+            if '.' in title:
+                title = title.split('.')[0]
+            
+            # Limit to reasonable length (first few key words)
+            words = title.split()
+            if len(words) > 8:  # If too many words, take first meaningful chunk
+                title = ' '.join(words[:8])
+            
+            # Clean up common endings
+            if title.endswith('.'):
+                title = title[:-1]
+                
+            return title.title()
     
-    # Fallback - return None to trigger user input
+    # Final fallback - return None to trigger user input
     return None
 
 def generate_title_from_purpose(purpose_text):
@@ -169,16 +179,24 @@ def generate_title_from_role(role_text):
 def generate_title_with_claude(content):
     """Use Claude API to generate an intelligent title"""
     try:
-        title_prompt = f"""Analyze this prompt and suggest a concise, professional title (2-4 words) that captures its main purpose or role:
+        title_prompt = f"""Analyze this prompt and suggest a concise, professional title (3-5 words) that captures the main role or purpose.
 
-{content[:500]}...
+Prompt content:
+{content[:800]}...
+
+Requirements:
+- 3-5 words maximum
+- Captures the core role/function
+- Professional and clear
+- No version numbers or technical details
+- Examples: "Strategic Performance Advisor", "Creative Innovation Strategist", "Knowledge Assessment Coach"
 
 Respond with ONLY the title, nothing else."""
         
         messages = [{"role": "user", "content": title_prompt}]
         
-        print_status("🤖 Generating title with Claude...", "processing")
-        response = call_claude_api(messages, max_tokens=50)
+        print_status("🤖 Generating intelligent title with Claude...", "processing")
+        response = call_claude_api(messages, max_tokens=30)
         
         if response:
             title = response.strip().strip('"').strip()
@@ -186,7 +204,12 @@ Respond with ONLY the title, nothing else."""
             if '\n' in title:
                 title = title.split('\n')[0].strip()
             
-            return title if len(title) <= 50 else title[:50].strip()
+            # Ensure reasonable length
+            words = title.split()
+            if len(words) > 6:  # If still too long, take first meaningful words
+                title = ' '.join(words[:5])  # Allow up to 5 words to match pattern
+            
+            return title if len(title) <= 60 else title[:60].strip()
         
     except Exception as e:
         print_status(f"Title generation failed: {e}", "warning")

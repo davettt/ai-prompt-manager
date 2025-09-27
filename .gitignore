@@ -1,13 +1,35 @@
-# Environment variables
+# Comprehensive .gitignore for AI Prompt Manager
+
+# Environment and secrets
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
+*.key
+*.pem
+config.json
 
-# Private prompts - NEVER commit these
+# Private prompts - CRITICAL (prevents accidental commits of personal prompts)
 prompts/private/
 prompts/private/*
+*_private.json
+*_personal.json
+
+# Personal data and backups
+local_data/
+*.zip
+*_backup_*
+*_report_*
+*_plan_*
+current_*.json
+*_reference.json
+*_config.json
+
+# Operation files (temporary)
+processed/
+archive/
+backup/
+debug_archive/
+temp_prompts/
 
 # Python
 __pycache__/
@@ -27,33 +49,97 @@ parts/
 sdist/
 var/
 wheels/
-pip-wheel-metadata/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 MANIFEST
 
-# IDE
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+.project
+.pydevproject
 
-# OS
+# macOS
 .DS_Store
-.DS_Store?
+.AppleDouble
+.LSOverride
+Icon?
 ._*
+.DocumentRevisions-V100
+.fseventsd
 .Spotlight-V100
+.TemporaryItems
 .Trashes
-ehthumbs.db
-Thumbs.db
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
 
-# Logs
-logs/
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# Logs and databases
 *.log
+logs/
+*.sqlite
+*.db
 
 # Temporary files
 tmp/
 temp/
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# Testing
+.tox/
+.coverage
+.pytest_cache/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Documentation builds
+docs/_build/
+site/
+
+# Personal notes (keep private)
+notes.txt
+todo.txt
+README_personal.md
+*_notes.md
+
+# API response samples (may contain personal data)
+samples/
+test_data/
+mock_responses/
+
+# Prompt testing and development
+test_prompts/
+draft_prompts/
+experimental/

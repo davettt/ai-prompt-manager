@@ -1,19 +1,13 @@
-# AI Prompt Manager - Claude Context
+# Claude Context - AI Prompt Manager
 
 ## Project Overview
-AI Prompt Manager - Professional-grade prompt storage and retrieval system focused on intelligent organization without content modification. Built using proven automation template patterns.
+AI Prompt Manager - Professional-grade prompt storage and retrieval system with intelligent metadata extraction and privacy-first architecture. Built using enhanced Python automation template patterns.
 
-## Current Development Status
-- **Phase:** Core Implementation Complete
-- **Status:** Ready for feature enhancement (Favorites system next)
-- **Approach:** Clean architecture eliminating problematic XML transformation workflows
-
-## Architecture Philosophy
-- **Content Preservation**: Never modify user's carefully crafted prompts
-- **Quality First**: Store only complete, optimized prompts  
-- **AI for Organization**: Use Claude API for categorization, not content changes
-- **Privacy Security**: Multiple layers preventing private content leaks
-- **Professional Standards**: Support sophisticated prompts with technical specifications
+## Development Status
+- **Foundation:** Complete
+- **Current Phase:** Ready for Favorites system implementation
+- **Next Milestone:** Enhanced search and usage analytics
+- **Architecture:** Clean system eliminating problematic XML transformation workflows
 
 ## Project Structure
 ```
@@ -30,22 +24,40 @@ ai-prompt-manager/
 │   └── private/               # Git ignored, personal prompts
 ├── .env                       # API keys (git ignored)
 ├── .gitignore                 # Privacy-first exclusions
+├── USER_START.md              # Quick setup guide
 └── README.md                  # Professional documentation
 ```
 
-## Key Features Implementation
+## Key Files & Locations
+- **Main script:** main.py (entry point)
+- **Core logic:** prompt_manager.py (CLI interface and operations)
+- **AI integration:** metadata_extractor.py (Claude API for metadata)
+- **Utilities:** utils/ folder (CLI helpers, file operations)
+- **Prompt library:** prompts/ (public/ and private/ separation)
+- **Configuration:** .env file (API keys)
 
-### Intelligent Metadata Extraction
-- **Enhanced title detection**: Parses multiple formats (markdown, JSON, role patterns)
-- **Automatic title generation**: Uses Claude API when title not found
-- **Technical specs parsing**: Extracts LLM recommendations, temperature, token limits
-- **JSON structure support**: Handles structured prompts with purpose/role fields
-- **AI categorization**: Uses Claude API to suggest categories and tags
-- **Privacy analysis**: AI reasoning for public/private recommendations
-- **Content preservation**: Zero modification of original prompt content
-- **Intelligent defaults**: Suggests technical parameters based on prompt type
+## API Integrations
+- **Anthropic Claude API**: Used for intelligent metadata extraction and categorization
+- **Rate limiting**: Efficient API usage patterns with graceful fallbacks
+- **Authentication**: Bearer token via ANTHROPIC_API_KEY environment variable
+- **Error handling**: Professional error messages and recovery when API unavailable
 
-### Enhanced Data Model
+## Architecture Philosophy
+- **Content Preservation**: Never modify user's carefully crafted prompts
+- **Quality First**: Store only complete, optimized prompts  
+- **AI for Organization**: Use Claude API for categorization, not content changes
+- **Privacy Security**: Multiple layers preventing private content leaks
+- **Professional Standards**: Support sophisticated prompts with technical specifications
+
+## Privacy-First Architecture
+- **Physical separation**: Private prompts in git-ignored directory
+- **Multiple protection layers**: .gitignore, directory structure, explicit flags
+- **Enhanced content-based privacy analysis**: Claude evaluates prompt content for confidential info AND personal characteristics
+- **Personal characterization detection**: Prompts containing user personality traits → PRIVATE
+- **Clear privacy criteria**: Private = personal/confidential; Public = general-purpose tools
+- **User confirmation**: Final privacy decision always with user
+
+## Enhanced Data Model
 ```json
 {
   "id": "uuid",
@@ -72,25 +84,6 @@ ai-prompt-manager/
 }
 ```
 
-### Privacy-First Architecture
-- **Physical separation**: Private prompts in git-ignored directory
-- **Multiple protection layers**: .gitignore, directory structure, explicit flags
-- **Enhanced content-based privacy analysis**: Claude evaluates prompt content for both confidential info AND personal characteristics
-- **Personal characterization detection**: Prompts containing user personality traits, individual challenges, or specific user contexts → PRIVATE
-- **Clear privacy criteria**: Private = contains personal/confidential info OR reveals user characteristics; Public = general-purpose tools
-- **User confirmation**: Final privacy decision always with user
-- **Examples**: Generic coaching frameworks = PUBLIC; Coaching with embedded user traits = PRIVATE
-
-### Professional CLI Interface
-- **Enhanced menu patterns**: From automation template
-- **Rich status indicators**: ✅❌⚠️ℹ️🔄 with consistent messaging
-- **Table displays**: Proper formatting for prompt listings
-- **Interactive detailed views**: Copy-to-clipboard, full content display
-- **Privacy management**: Change privacy settings between public/private
-- **Search functionality**: Full-text search across all metadata fields
-- **Error handling**: Graceful keyboard interrupt and validation
-- **Progress feedback**: Clear status updates during operations
-
 ## Template Patterns Implemented
 
 ### From python-automation-template:
@@ -99,24 +92,29 @@ ai-prompt-manager/
 - ✅ Proper error handling and graceful exits
 - ✅ Table formatting for data display
 - ✅ Validation patterns for user input
+- ✅ Professional documentation standards
+- ✅ USER_START.md for quick setup
+- ✅ Comprehensive .gitignore protecting private content
 
 ### Security & Privacy:
 - ✅ Environment variables for API credentials
-- ✅ Comprehensive .gitignore protecting private content
 - ✅ Clear separation of public/private data
 - ✅ No hardcoded secrets anywhere
+- ✅ Enhanced .gitignore with multiple protection layers
 
-## API Integration Details
-- **Claude API**: Used only for metadata analysis, never content modification
-- **Fallback support**: Graceful degradation when API unavailable
-- **Rate limiting awareness**: Efficient API usage patterns
-- **Error handling**: Professional error messages and recovery
+## Common Patterns Used
+- **Enhanced CLI helpers**: Professional status indicators (✅❌⚠️ℹ️🔄)
+- **File management utilities**: Safe filename generation, directory creation
+- **Error handling**: Graceful keyboard interrupt and validation
+- **Table displays**: Proper formatting for prompt listings
+- **Privacy management**: Change privacy settings between public/private
 
-## Development Workflow
-- **Clean architecture**: No legacy code from problematic previous XML workflows
+## Development Notes
+- **Clean architecture**: No legacy code from problematic XML workflows
 - **Quality focus**: Accept only optimized, complete prompts
 - **User agency**: All AI suggestions are confirmable/modifiable by user
 - **Preservation first**: Original prompt content never touched
+- **Fallback support**: Graceful degradation when API unavailable
 
 ## Future Enhancements
 - **Favorites system**: Quick access to most-used prompts (next priority)
@@ -126,7 +124,7 @@ ai-prompt-manager/
 - **Bulk operations**: Import/export prompt collections
 
 ## Usage Instructions for New Conversations
-"I'm working on ai-prompt-manager. Please read CLAUDE_CONTEXT.md to understand the architecture, intelligent metadata extraction approach, privacy-first design, and enhanced CLI patterns before proceeding."
+"I'm working on the ai-prompt-manager project. Please read CLAUDE_CONTEXT.md to understand the intelligent metadata extraction approach, privacy-first design, enhanced CLI patterns, and template compliance before proceeding."
 
 ## Testing Priority
 1. **Metadata extraction**: Test with Elite Strategic Performance Advisor prompt
@@ -136,5 +134,5 @@ ai-prompt-manager/
 5. **User workflow**: End-to-end prompt addition experience
 
 ---
-*Architecture: Clean system eliminating problematic XML transformation workflows*  
-*Status: Ready for Favorites system implementation*
+*Status: Template-aligned foundation ready for Favorites system implementation*  
+*Architecture: Professional prompt management with content preservation focus*
