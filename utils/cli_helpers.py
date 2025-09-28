@@ -134,7 +134,7 @@ def validate_input(prompt, validator_func, error_message="Invalid input"):
             print_status(error_message, "error")
 
 def display_prompt_summary(prompt_data):
-    """Display a formatted prompt summary"""
+    """Display a formatted prompt summary with discovery info"""
     print(f"\n📝 {prompt_data.get('title', 'Untitled')}")
     print(f"📁 Category: {prompt_data.get('category', 'general')}")
     
@@ -145,10 +145,37 @@ def display_prompt_summary(prompt_data):
     privacy = "Private" if prompt_data.get('private', False) else "Public"
     print(f"🔒 Privacy: {privacy}")
     
+    # Discovery information - NEW!
+    discovery = prompt_data.get('discovery', {})
+    if discovery and isinstance(discovery, dict):
+        print("\n💡 Discovery Information:")
+        
+        if discovery.get('purpose'):
+            print(f"   • Purpose: {discovery['purpose']}")
+        
+        if discovery.get('best_for'):
+            best_for = discovery['best_for']
+            if isinstance(best_for, list):
+                print(f"   • Best for: {', '.join(best_for)}")
+            else:
+                print(f"   • Best for: {best_for}")
+        
+        if discovery.get('session_length'):
+            print(f"   • Session length: {discovery['session_length']}")
+        
+        if discovery.get('interaction_style'):
+            print(f"   • Style: {discovery['interaction_style']}")
+        
+        if discovery.get('outcome'):
+            print(f"   • Outcome: {discovery['outcome']}")
+        
+        if discovery.get('try_if'):
+            print(f"   • Try if: {discovery['try_if']}")
+    
     # Technical details - handle None values safely
     tech = prompt_data.get('technical_notes', {})
     if tech and isinstance(tech, dict) and any(v for v in tech.values() if v is not None):
-        print("🔧 Technical:")
+        print("\n🔧 Technical:")
         if tech.get('recommended_llm'):
             print(f"   • LLM: {tech['recommended_llm']}")
         if tech.get('temperature') is not None:

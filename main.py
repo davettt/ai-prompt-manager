@@ -60,29 +60,24 @@ def main():
         while True:
             print("\nOptions:")
             print("[1] Add new prompt")
-            print("[2] List all prompts") 
+            print("[2] Browse prompts")
             print("[3] Search prompts")
-            print("[4] Run system tests")
-            print("[5] Exit")
+            print("[4] Exit")
             
             try:
-                choice = input("\nSelect option [1-5]: ").strip()
+                choice = input("\nSelect option [1-4]: ").strip()
                 
                 if choice == '1':
                     manager.add_prompt()
                 elif choice == '2':
-                    manager.list_prompts()
+                    manager.browse_prompts()
                 elif choice == '3':
                     manager.search_prompts()
                 elif choice == '4':
-                    print_status("Running system tests...", "info")
-                    from test_system import run_all_tests
-                    run_all_tests()
-                elif choice == '5':
                     print_status("Thanks for using AI Prompt Manager! 👋", "success")
                     break
                 else:
-                    print_status("Invalid choice. Please select 1-5.", "error")
+                    print_status("Invalid choice. Please select 1-4.", "error")
                     
             except KeyboardInterrupt:
                 print_status("\n\nThanks for using AI Prompt Manager! 👋", "success")

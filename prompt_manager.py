@@ -91,6 +91,7 @@ class PromptManager:
             'created': datetime.now().isoformat(),
             'last_used': None,
             'usage_count': 0,
+            'favorite': False,  # New favorites field
             'discovery': metadata.get('discovery', {}),
             'technical_notes': {
                 'recommended_llm': metadata.get('recommended_llm'),
@@ -241,69 +242,507 @@ class PromptManager:
             print_status(f"Error saving prompt: {e}", "error")
             return False
     
-    def list_prompts(self):
-        """List all available prompts"""
-        display_header("Prompt Library")
+    def browse_prompts(self, initial_filter=""):
+        """Unified prompt browser with filtering and inline expansion"""
+        display_header("📋 Prompt Browser")
         
-        prompts = find_all_prompts(self.base_path)
+        # Get all prompts (unified list)
+        all_prompts = find_all_prompts(self.base_path)
         
-        if not prompts:
+        if not all_prompts:
             print_status("No prompts found", "warning")
             return
         
-        # Group by privacy and category
-        public_prompts = [p for p in prompts if not p.get('private', False)]
-        private_prompts = [p for p in prompts if p.get('private', False)]
+        # Sort by title for consistent ordering
+        all_prompts.sort(key=lambda p: p.get('title', '').lower())
         
-        if public_prompts:
-            display_section(f"Public Prompts ({len(public_prompts)})")
-            self._display_prompt_list(public_prompts)
+        current_filter = initial_filter
         
-        if private_prompts:
-            display_section(f"Private Prompts ({len(private_prompts)})")
-            self._display_prompt_list(private_prompts)
+        while True:
+            # Apply current filter
+            if current_filter:
+                filtered_prompts = self._apply_filter(all_prompts, current_filter)
+            else:
+                filtered_prompts = all_prompts
+            
+            # Display filtered browser
+            result = self._display_filtered_prompt_browser(filtered_prompts, current_filter, len(all_prompts))
+            
+            if result == "exit":
+                break
+            elif result and result.startswith("filter:"):
+                current_filter = result[7:]  # Remove "filter:" prefix
+            elif result == "clear_filter":
+                current_filter = ""
     
-    def _display_prompt_list(self, prompts):
-        """Display a list of prompts in table format"""
+    def _apply_filter(self, prompts, filter_text):
+        """Apply filter with smart OR logic and relevance scoring"""
+        if not filter_text:
+            return prompts
+        
+        filter_lower = filter_text.lower().strip()
+        
+        # Handle special single-term filters
+        if filter_lower in ["⭐", "favorites"]:
+            return [p for p in prompts if p.get('favorite', False)]
+        if filter_lower == "private":
+            return [p for p in prompts if p.get('private', False)]
+        if filter_lower == "public":
+            return [p for p in prompts if not p.get('private', False)]
+        
+        # Multi-term search with OR logic and scoring
+        terms = [term for term in filter_lower.split() if len(term) >= 2]
+        if not terms:
+            return prompts
+        
+        # Score each prompt for relevance
+        scored_prompts = []
+        
+        for prompt in prompts:
+            score = 0
+            matched_terms = set()
+            
+            title = prompt.get('title', '').lower()
+            category = prompt.get('category', '').lower()
+            tags = [tag.lower() for tag in prompt.get('tags', [])]
+            
+            # Get discovery text
+            discovery = prompt.get('discovery', {})
+            discovery_text = ''
+            if discovery:
+                discovery_text = (
+                    discovery.get('purpose', '').lower() + ' ' +
+                    discovery.get('interaction_style', '').lower() + ' ' +
+                    discovery.get('try_if', '').lower()
+                )
+                best_for = discovery.get('best_for', '')
+                if isinstance(best_for, list):
+                    discovery_text += ' ' + ' '.join(best_for).lower()
+                elif isinstance(best_for, str):
+                    discovery_text += ' ' + best_for.lower()
+            
+            # Score each term
+            for term in terms:
+                term_score = 0
+                
+                # High score: exact title match or title contains term
+                if term in title:
+                    term_score += 10
+                    matched_terms.add(term)
+                
+                # Medium-high score: category match
+                if term in category:
+                    term_score += 7
+                    matched_terms.add(term)
+                
+                # Medium score: tag match  
+                if any(term in tag for tag in tags):
+                    term_score += 5
+                    matched_terms.add(term)
+                
+                # Lower score: discovery match (only for 3+ char terms)
+                if len(term) >= 3 and term in discovery_text:
+                    term_score += 2
+                    matched_terms.add(term)
+                
+                score += term_score
+            
+            # Bonus for matching multiple terms
+            if len(matched_terms) > 1:
+                score += len(matched_terms) * 2
+            
+            # Only include prompts that matched at least one term
+            if matched_terms:
+                scored_prompts.append((prompt, score, matched_terms))
+        
+        # Sort by score (highest first) and return just the prompts
+        scored_prompts.sort(key=lambda x: x[1], reverse=True)
+        
+        return [prompt for prompt, score, matches in scored_prompts]
+    
+    def _display_filtered_prompt_browser(self, prompts, current_filter, total_count):
+        """Display the unified prompt browser with filtering and smart refinement"""
+        if not prompts:
+            if current_filter:
+                print_status(f"No prompts found matching '{current_filter}'", "warning")
+                choice = input("\n[Enter] to clear filter or [q] to exit: ").strip().lower()
+                return "clear_filter" if choice == "" else "exit"
+            else:
+                print_status("No prompts found", "warning")
+                return "exit"
+        
+        # Smart refinement suggestion for too many results
+        if len(prompts) > 15 and current_filter and len(current_filter) <= 3:
+            print_status(f"Found {len(prompts)} results for '{current_filter}' - consider refining your search", "info")
+            print("💡 Try: '{current_filter} strategy', '{current_filter} coaching', or '{current_filter} productivity'")
+            refine = input("\nRefine search or [Enter] to view all results: ").strip()
+            if refine:
+                return f"filter:{current_filter} {refine}"
+        
+        # Track expanded state for each prompt
+        expanded_prompts = set()
+        
+        while True:
+            # Clear screen for clean display
+            print("\033[2J\033[H", end="")
+            
+            print("\n" + "="*70)
+            print(f"📋 PROMPT BROWSER ({total_count} prompts)")
+            print("="*70)
+            
+            # Show filter status
+            if current_filter:
+                print(f"🔍 Filter: {current_filter}                              [x] Clear")
+            else:
+                print(f"🔍 Filter: [                    ] [Enter to search]")
+            print()
+            
+            # Count public/private in filtered results
+            public_count = len([p for p in prompts if not p.get('private', False)])
+            private_count = len([p for p in prompts if p.get('private', False)])
+            
+            # Display prompts with inline expansion
+            for i, prompt in enumerate(prompts, 1):
+                title = prompt.get('title', 'Untitled')
+                
+                # Add star indicator 
+                if prompt.get('favorite', False):
+                    title = f"⭐ {title}"
+                
+                # Privacy indicator
+                privacy_icon = "🔒" if prompt.get('private', False) else "🌐"
+                privacy_label = "Private" if prompt.get('private', False) else "Public"
+                
+                is_expanded = i in expanded_prompts
+                
+                # Show prompt title with privacy
+                if is_expanded:
+                    print(f"\n[{i}] {title} [EXPANDED]")
+                else:
+                    print(f"\n[{i}] {title}")
+                
+                category = prompt.get('category', 'general')
+                print(f"    📁 {category} • {privacy_icon} {privacy_label}")
+                
+                # Show discovery info if expanded
+                if is_expanded:
+                    discovery = prompt.get('discovery', {})
+                    if discovery and isinstance(discovery, dict):
+                        if discovery.get('purpose'):
+                            print(f"    💡 {discovery['purpose']}")
+                        
+                        # Combine key info on one line
+                        info_parts = []
+                        if discovery.get('session_length'):
+                            info_parts.append(f"⏱️ {discovery['session_length']}")
+                        if discovery.get('interaction_style'):
+                            info_parts.append(f"🎭 {discovery['interaction_style']}")
+                        
+                        if info_parts:
+                            print(f"    {' • '.join(info_parts)}")
+                        
+                        if discovery.get('try_if'):
+                            print(f"    🤔 Try if: {discovery['try_if']}")
+                    
+                    # Add technical info to expanded view
+                    tech = prompt.get('technical_notes', {})
+                    if tech and isinstance(tech, dict):
+                        tech_parts = []
+                        if tech.get('recommended_llm'):
+                            tech_parts.append(tech['recommended_llm'])
+                        if tech.get('temperature') is not None:
+                            tech_parts.append(f"{tech['temperature']} temp")
+                        if tech.get('max_tokens'):
+                            tech_parts.append(f"{tech['max_tokens']} tokens")
+                        
+                        if tech_parts:
+                            print(f"    🔧 {' • '.join(tech_parts)}")
+                    
+                    # Show quick actions for expanded prompts
+                    is_favorite = prompt.get('favorite', False)
+                    fav_icon = "⭐" if is_favorite else "☆"
+                    fav_action = "unfav" if is_favorite else "fav"
+                    print(f"    ➤ [{i}f] Full prompt  [{i}c] Copy  [{i}{fav_action}] {fav_icon} Favorite")
+            
+            print("\n" + "="*70)
+            
+            # Show summary
+            if current_filter:
+                print(f"📊 {len(prompts)} results: {public_count} public • {private_count} private")
+            else:
+                print(f"📊 {len(prompts)} prompts: {public_count} public • {private_count} private")
+            
+            print("📝 Commands:")
+            if current_filter:
+                print("  • [number] = toggle info • [x] = clear filter")
+            else:
+                print("  • [number] = toggle info • Type text to filter (OR logic, scored by relevance)")
+            print("  • [number]f = full prompt • [number]c = copy • [⭐] = favorites")
+            print("  • [q] = back to main menu")
+            
+            choice = input("\n🎯 Command: ").strip()
+            
+            if choice.lower() == 'q' or not choice:
+                return "exit"
+            elif choice.lower() == 'x' and current_filter:
+                return "clear_filter"
+            elif choice == "⭐":
+                return "filter:⭐"
+            elif choice.lower() in ['private', 'public', 'favorites']:
+                return f"filter:{choice.lower()}"
+            elif choice.endswith('f'):
+                # Show full prompt content
+                try:
+                    num = int(choice[:-1])
+                    if 1 <= num <= len(prompts):
+                        idx = num - 1
+                        self._show_full_prompt_content(prompts[idx])
+                        input("Press Enter to continue...")
+                    else:
+                        print_status(f"Invalid prompt number: {num}", "error")
+                        input("Press Enter to continue...")
+                except ValueError:
+                    print_status("Invalid format. Use number+f (e.g., '3f')", "error")
+                    input("Press Enter to continue...")
+            elif choice.endswith('c'):
+                # Copy prompt
+                try:
+                    num = int(choice[:-1])
+                    if 1 <= num <= len(prompts):
+                        idx = num - 1
+                        self._copy_to_clipboard(prompts[idx]['content'])
+                        input("Press Enter to continue...")
+                    else:
+                        print_status(f"Invalid prompt number: {num}", "error")
+                        input("Press Enter to continue...")
+                except ValueError:
+                    print_status("Invalid format. Use number+c (e.g., '3c')", "error")
+                    input("Press Enter to continue...")
+            elif choice.endswith('fav') or choice.endswith('unfav'):
+                # Toggle favorite
+                try:
+                    if choice.endswith('fav'):
+                        num = int(choice[:-3])
+                    else:
+                        num = int(choice[:-5])
+                    
+                    if 1 <= num <= len(prompts):
+                        idx = num - 1
+                        self._toggle_favorite(prompts[idx])
+                        input("Press Enter to continue...")
+                    else:
+                        print_status(f"Invalid prompt number: {num}", "error")
+                        input("Press Enter to continue...")
+                except ValueError:
+                    print_status("Invalid format. Use number+fav (e.g., '3fav')", "error")
+                    input("Press Enter to continue...")
+            elif choice.isdigit():
+                # Toggle expansion
+                num = int(choice)
+                if 1 <= num <= len(prompts):
+                    if num in expanded_prompts:
+                        expanded_prompts.remove(num)
+                    else:
+                        expanded_prompts.add(num)
+                    # Immediate redraw - no pause
+                else:
+                    print_status(f"Invalid prompt number: {num}", "error")
+                    input("Press Enter to continue...")
+            elif not current_filter and choice:
+                # Apply new filter - strip any brackets
+                clean_choice = choice.strip('[]')
+                return f"filter:{clean_choice}"
+    
+    def _display_prompt_list(self, prompts, show_stars=False):
+        """Display a list of prompts with smooth inline expansion"""
         if not prompts:
             print_status("No prompts found", "info")
             return
         
-        # Prepare table data
-        headers = ["#", "Title", "Category", "LLM", "Tags"]
-        rows = []
+        # Track expanded state for each prompt
+        expanded_prompts = set()
         
-        for i, prompt in enumerate(prompts, 1):
-            title = prompt.get('title', 'Untitled')[:30]  # Truncate long titles
-            category = prompt.get('category', 'general')[:20]
+        while True:
+            # Clear screen for clean display
+            print("\033[2J\033[H", end="")  # Clear screen and move cursor to top
             
-            # Get LLM recommendation - handle None values properly
-            tech = prompt.get('technical_notes', {})
-            if tech and isinstance(tech, dict):
-                llm_raw = tech.get('recommended_llm')
-                llm = (llm_raw or 'Not specified')[:15]
+            print("\n" + "="*70)
+            print("📋 PROMPT BROWSER")
+            print("="*70)
+            
+            # Display prompts with inline expansion
+            for i, prompt in enumerate(prompts, 1):
+                title = prompt.get('title', 'Untitled')
+                
+                # Add star indicator 
+                if prompt.get('favorite', False):
+                    title = f"⭐ {title}"
+                
+                is_expanded = i in expanded_prompts
+                
+                # Show prompt title
+                if is_expanded:
+                    print(f"\n[{i}] {title} [EXPANDED]")
+                else:
+                    print(f"\n[{i}] {title}")
+                
+                # Show basic info always
+                category = prompt.get('category', 'general')
+                privacy = "Private" if prompt.get('private', False) else "Public"
+                print(f"    📁 {category} • 🔒 {privacy}")
+                
+                # Show discovery info if expanded
+                if is_expanded:
+                    discovery = prompt.get('discovery', {})
+                    if discovery and isinstance(discovery, dict):
+                        if discovery.get('purpose'):
+                            print(f"    💡 {discovery['purpose']}")
+                        
+                        # Combine key info on one line
+                        info_parts = []
+                        if discovery.get('session_length'):
+                            info_parts.append(f"⏱️ {discovery['session_length']}")
+                        if discovery.get('interaction_style'):
+                            info_parts.append(f"🎭 {discovery['interaction_style']}")
+                        
+                        if info_parts:
+                            print(f"    {' • '.join(info_parts)}")
+                        
+                        if discovery.get('try_if'):
+                            print(f"    🤔 Try if: {discovery['try_if']}")
+                    
+                    # Add technical info to expanded view
+                    tech = prompt.get('technical_notes', {})
+                    if tech and isinstance(tech, dict):
+                        tech_parts = []
+                        if tech.get('recommended_llm'):
+                            tech_parts.append(tech['recommended_llm'])
+                        if tech.get('temperature') is not None:
+                            tech_parts.append(f"{tech['temperature']} temp")
+                        if tech.get('max_tokens'):
+                            tech_parts.append(f"{tech['max_tokens']} tokens")
+                        
+                        if tech_parts:
+                            print(f"    🔧 {' • '.join(tech_parts)}")
+                    
+                    # Show quick actions for expanded prompts
+                    is_favorite = prompt.get('favorite', False)
+                    fav_icon = "⭐" if is_favorite else "☆"
+                    fav_action = "unfav" if is_favorite else "fav"
+                    print(f"    ➤ [{i}f] Full prompt  [{i}c] Copy prompt  [{i}{fav_action}] {fav_icon} Favorite")
+            
+            print("\n" + "="*70)
+            print("📝 Commands:")
+            print("  • [number] = toggle discovery info (e.g., '3')")
+            print("  • [number]f = full prompt content (e.g., '3f')")
+            print("  • [number]c = copy prompt (e.g., '3c')")
+            print("  • [number]fav/unfav = toggle favorite (e.g., '3fav')")
+            print("  • [q] = back to main menu")
+            
+            choice = input("\n🎯 Command: ").strip().lower()
+            
+            if choice == 'q' or not choice:
+                # Return to main menu
+                break
+            elif choice.endswith('f'):
+                # Show full prompt content
+                try:
+                    num = int(choice[:-1])
+                    if 1 <= num <= len(prompts):
+                        idx = num - 1
+                        self._show_full_prompt_content(prompts[idx])
+                        input("Press Enter to continue...")
+                    else:
+                        print_status(f"Invalid prompt number: {num}", "error")
+                        input("Press Enter to continue...")
+                except ValueError:
+                    print_status("Invalid format. Use number+f (e.g., '3f')", "error")
+                    input("Press Enter to continue...")
+            elif choice.endswith('c'):
+                # Copy prompt
+                try:
+                    num = int(choice[:-1])
+                    if 1 <= num <= len(prompts):
+                        idx = num - 1
+                        self._copy_to_clipboard(prompts[idx]['content'])
+                        input("Press Enter to continue...")
+                    else:
+                        print_status(f"Invalid prompt number: {num}", "error")
+                        input("Press Enter to continue...")
+                except ValueError:
+                    print_status("Invalid format. Use number+c (e.g., '3c')", "error")
+                    input("Press Enter to continue...")
+            elif choice.endswith('fav') or choice.endswith('unfav'):
+                # Toggle favorite
+                try:
+                    if choice.endswith('fav'):
+                        num = int(choice[:-3])  # Remove 'fav'
+                    else:
+                        num = int(choice[:-5])  # Remove 'unfav'
+                    
+                    if 1 <= num <= len(prompts):
+                        idx = num - 1
+                        self._toggle_favorite(prompts[idx])
+                        input("Press Enter to continue...")
+                    else:
+                        print_status(f"Invalid prompt number: {num}", "error")
+                        input("Press Enter to continue...")
+                except ValueError:
+                    print_status("Invalid format. Use number+fav or number+unfav (e.g., '3fav')", "error")
+                    input("Press Enter to continue...")
+            elif choice.isdigit():
+                # Toggle expansion
+                num = int(choice)
+                if 1 <= num <= len(prompts):
+                    if num in expanded_prompts:
+                        expanded_prompts.remove(num)
+                    else:
+                        expanded_prompts.add(num)
+                    # Immediate redraw - no pause
+                else:
+                    print_status(f"Invalid prompt number: {num}", "error")
+                    input("Press Enter to continue...")
             else:
-                llm = 'Not specified'
+                print_status("Invalid command. Use number, numberf, numberc, or q", "error")
+                input("Press Enter to continue...")
+    
+    def _show_full_prompt_content(self, prompt_data):
+        """Show the complete prompt content in a clean format"""
+        title = prompt_data.get('title', 'Untitled')
+        
+        # Clear screen for clean view
+        print("\033[2J\033[H", end="")
+        
+        print("\n" + "="*70)
+        print(f"📋 {title}")
+        print("="*70)
+        
+        # Show the complete prompt content
+        content = prompt_data.get('content', 'No content available')
+        print(content)
+        
+        print("\n" + "─"*70)
+        
+        # Quick actions at bottom
+        is_favorite = prompt_data.get('favorite', False)
+        fav_icon = "⭐" if is_favorite else "☆"
+        fav_action = "Remove from" if is_favorite else "Add to"
+        
+        print(f"[c] Copy to clipboard  [{fav_icon}] {fav_action} favorites  [q] Back to browser")
+        
+        while True:
+            action = input("\n🎯 Action: ").strip().lower()
             
-            # Get tags - handle None values properly
-            tags = prompt.get('tags', [])
-            if tags and isinstance(tags, list):
-                tags_str = ', '.join(str(tag) for tag in tags)[:25]
+            if action == 'c':
+                self._copy_to_clipboard(content)
+                break
+            elif action == fav_icon or action == 'star' or action == 'fav':
+                self._toggle_favorite(prompt_data)
+                break
+            elif action == 'q' or action == '':
+                break
             else:
-                tags_str = 'None'
-            
-            rows.append([str(i), title, category, llm, tags_str])
-        
-        display_table(headers, rows)
-        
-        # Offer detailed view option
-        print("💡 Enter a number (1-{}) to see detailed view, or press Enter to continue".format(len(prompts)))
-        choice = input("Selection: ").strip()
-        
-        if choice.isdigit():
-            idx = int(choice) - 1
-            if 0 <= idx < len(prompts):
-                self._show_detailed_prompt(prompts[idx])
+                print_status("Invalid action. Use 'c', 'fav', or 'q'", "error")
     
     def _show_detailed_prompt(self, prompt_data):
         """Show detailed view of a specific prompt"""
@@ -321,15 +760,19 @@ class PromptManager:
             print()
         
         # Options for this prompt
+        is_favorite = prompt_data.get('favorite', False)
+        favorite_action = 'Remove from favorites' if is_favorite else 'Add to favorites'
+        
         print("Actions:")
         print("[1] Copy content to clipboard")
         print("[2] Show full content")
         print("[3] Edit metadata")
-        print("[4] Change privacy setting")
-        print("[5] Delete prompt")
-        print("[6] Back to list")
+        print(f"[4] ⭐ {favorite_action}")
+        print("[5] Change privacy setting")
+        print("[6] Delete prompt")
+        print("[7] Back to list")
         
-        options = ['Copy to clipboard', 'Show full content', 'Edit metadata', 'Change privacy setting', 'Delete prompt', 'Back to list']
+        options = ['Copy to clipboard', 'Show full content', 'Edit metadata', favorite_action, 'Change privacy setting', 'Delete prompt', 'Back to list']
         choice = get_user_choice(options, "Select action")
         
         if choice == 0:  # Copy to clipboard
@@ -338,11 +781,13 @@ class PromptManager:
             self._show_full_content(prompt_data)
         elif choice == 2:  # Edit metadata
             print_status("Metadata editing coming soon", "info")
-        elif choice == 3:  # Change privacy setting
+        elif choice == 3:  # Toggle favorite
+            self._toggle_favorite(prompt_data)
+        elif choice == 4:  # Change privacy setting
             self._change_privacy_setting(prompt_data)
-        elif choice == 4:  # Delete prompt
+        elif choice == 5:  # Delete prompt
             self._delete_prompt(prompt_data)
-        # choice == 5 returns to list
+        # choice == 6 returns to list
     
     def _copy_to_clipboard(self, content):
         """Copy content to clipboard if possible"""
@@ -462,10 +907,10 @@ class PromptManager:
             return False
     
     def search_prompts(self):
-        """Search prompts by title, content, category, or tags"""
-        display_header("Search Prompts")
+        """Search prompts and open browser with filter applied"""
+        display_header("🔍 Search Prompts")
         
-        search_query = input("Enter search term (title, category, content, or tag): ").strip().lower()
+        search_query = input("Enter search term (title, category, content, or tag): ").strip()
         
         if not search_query:
             print_status("No search term provided", "warning")
@@ -473,68 +918,25 @@ class PromptManager:
         
         print_status(f"Searching for: '{search_query}'", "processing")
         
-        # Get all prompts
-        all_prompts = find_all_prompts(self.base_path)
+        # Open browser with search filter applied
+        self.browse_prompts(initial_filter=search_query)
+    
+    def _toggle_favorite(self, prompt_data):
+        """Toggle favorite status for a prompt"""
+        title = prompt_data.get('title', 'Unknown')
+        current_favorite = prompt_data.get('favorite', False)
+        new_status = not current_favorite
         
-        if not all_prompts:
-            print_status("No prompts found in library", "warning")
-            return
+        # Update favorite status
+        prompt_data['favorite'] = new_status
         
-        # Search through prompts
-        matches = []
-        
-        for prompt in all_prompts:
-            # Search in title
-            if search_query in prompt.get('title', '').lower():
-                matches.append((prompt, 'title'))
-                continue
-            
-            # Search in category
-            if search_query in prompt.get('category', '').lower():
-                matches.append((prompt, 'category'))
-                continue
-            
-            # Search in tags
-            tags = prompt.get('tags', [])
-            if any(search_query in tag.lower() for tag in tags):
-                matches.append((prompt, 'tags'))
-                continue
-            
-            # Search in content (limited to first 500 chars for performance)
-            content_preview = prompt.get('content', '')[:500].lower()
-            if search_query in content_preview:
-                matches.append((prompt, 'content'))
-                continue
-        
-        if not matches:
-            print_status(f"No matches found for '{search_query}'", "warning")
-            return
-        
-        print_status(f"Found {len(matches)} match{'es' if len(matches) != 1 else ''}", "success")
-        
-        # Display results with match context
-        display_section("Search Results")
-        
-        headers = ["#", "Title", "Category", "Match Type", "Privacy"]
-        rows = []
-        
-        for i, (prompt, match_type) in enumerate(matches, 1):
-            title = prompt.get('title', 'Untitled')[:25]
-            category = prompt.get('category', 'general')[:15]
-            privacy = 'Private' if prompt.get('private', False) else 'Public'
-            
-            rows.append([str(i), title, category, match_type.title(), privacy])
-        
-        display_table(headers, rows)
-        
-        # Offer detailed view option
-        print("💡 Enter a number (1-{}) to see detailed view, or press Enter to continue".format(len(matches)))
-        choice = input("Selection: ").strip()
-        
-        if choice.isdigit():
-            idx = int(choice) - 1
-            if 0 <= idx < len(matches):
-                self._show_detailed_prompt(matches[idx][0])
+        # Save updated prompt
+        filepath = prompt_data.get('_filepath')
+        if filepath and save_prompt_to_file(prompt_data, filepath):
+            action = "Added to" if new_status else "Removed from"
+            print_status(f"{action} favorites: '{title}' ⭐", "success")
+        else:
+            print_status(f"Failed to update favorite status for '{title}'", "error")
 
 def main():
     """Main application entry point with enhanced error handling"""
@@ -547,7 +949,7 @@ def main():
         while True:
             print("\nOptions:")
             print("[1] Add new prompt")
-            print("[2] List all prompts")
+            print("[2] Browse prompts")
             print("[3] Search prompts")
             print("[4] Exit")
             
@@ -557,7 +959,7 @@ def main():
                 if choice == '1':
                     manager.add_prompt()
                 elif choice == '2':
-                    manager.list_prompts()
+                    manager.browse_prompts()
                 elif choice == '3':
                     manager.search_prompts()
                 elif choice == '4':
