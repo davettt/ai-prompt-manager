@@ -8,6 +8,12 @@ import os
 import uuid
 from datetime import datetime
 
+# Enable readline for better input editing (arrow keys, etc.)
+try:
+    import readline  # noqa: F401 - This enables arrow keys in input()
+except ImportError:
+    pass  # Not available on Windows, input() will work but without arrow keys
+
 from metadata_extractor import extract_all_metadata
 from utils.cli_helpers import (
     confirm_action,
@@ -288,6 +294,10 @@ class PromptManager:
         current_filter = initial_filter
 
         while True:
+            # Reload prompts if needed (in case of deletion/edit)
+            all_prompts = find_all_prompts(self.base_path)
+            all_prompts.sort(key=lambda p: p.get("title", "").lower())
+
             # Apply current filter
             if current_filter:
                 filtered_prompts = self._apply_filter(all_prompts, current_filter)
@@ -301,6 +311,9 @@ class PromptManager:
 
             if result == "exit":
                 break
+            elif result == "refresh":
+                # Reload prompts - loop continues with fresh data
+                continue
             elif result and result.startswith("filter:"):
                 current_filter = result[7:]  # Remove "filter:" prefix
             elif result == "clear_filter":
@@ -530,6 +543,9 @@ class PromptManager:
             print(
                 "  • [number]f = full • [number]c = copy • [number]p = Claude Project • [⭐] = favorites"
             )
+            print(
+                "  • [number]fav/unfav = favorite • [number]d = delete • [number]e = edit"
+            )
             print("  • [q] = back to main menu")
 
             choice = input("\n🎯 Command: ").strip()
@@ -603,6 +619,37 @@ class PromptManager:
                     print_status(
                         "Invalid format. Use number+fav (e.g., '3fav')", "error"
                     )
+                    input("Press Enter to continue...")
+            elif choice.endswith("d"):
+                # Delete prompt
+                try:
+                    num = int(choice[:-1])
+                    if 1 <= num <= len(prompts):
+                        idx = num - 1
+                        if self._delete_prompt(prompts[idx]):
+                            # Refresh the prompt list after deletion
+                            return "refresh"
+                        input("Press Enter to continue...")
+                    else:
+                        print_status(f"Invalid prompt number: {num}", "error")
+                        input("Press Enter to continue...")
+                except ValueError:
+                    print_status("Invalid format. Use number+d (e.g., '3d')", "error")
+                    input("Press Enter to continue...")
+            elif choice.endswith("e"):
+                # Edit prompt metadata
+                try:
+                    num = int(choice[:-1])
+                    if 1 <= num <= len(prompts):
+                        idx = num - 1
+                        if self._edit_prompt_metadata(prompts[idx]):
+                            return "refresh"  # Refresh after edit
+                        input("Press Enter to continue...")
+                    else:
+                        print_status(f"Invalid prompt number: {num}", "error")
+                        input("Press Enter to continue...")
+                except ValueError:
+                    print_status("Invalid format. Use number+e (e.g., '3e')", "error")
                     input("Press Enter to continue...")
             elif choice.isdigit():
                 # Toggle expansion
@@ -782,8 +829,9 @@ class PromptManager:
                 input("Press Enter to continue...")
 
     def _show_full_prompt_content(self, prompt_data):
-        """Show the complete prompt content in a clean format"""
+        """Show the complete prompt content with rendered markdown"""
         title = prompt_data.get("title", "Untitled")
+        content = prompt_data.get("content", "No content available")
 
         # Clear screen for clean view
         print("\033[2J\033[H", end="")
@@ -791,10 +839,21 @@ class PromptManager:
         print("\n" + "=" * 70)
         print(f"📋 {title}")
         print("=" * 70)
+        print()
 
-        # Show the complete prompt content
-        content = prompt_data.get("content", "No content available")
-        print(content)
+        # Try to render markdown with Rich, fall back to plain text
+        try:
+            from rich.console import Console
+            from rich.markdown import Markdown
+
+            console = Console()
+            md = Markdown(content)
+            console.print(md)
+
+        except ImportError:
+            # Fallback to plain markdown if Rich not installed
+            print(content)
+            print("\n💡 Install 'rich' for better formatted display: pip install rich")
 
         print("\n" + "─" * 70)
 
@@ -804,16 +863,18 @@ class PromptManager:
         fav_action = "Remove from" if is_favorite else "Add to"
 
         print(
-            f"[c] Copy to clipboard  [p] Copy for Claude Project  [{fav_icon}] {fav_action} favorites  [q] Back to browser"
+            f"[c] Copy to clipboard (raw markdown)  [p] Copy for Claude Project  [{fav_icon}] {fav_action} favorites  [q] Back"
         )
 
         while True:
             action = input("\n🎯 Action: ").strip().lower()
 
             if action == "c":
+                # Copy RAW markdown (not rendered)
                 self._copy_to_clipboard(content)
                 break
             elif action == "p":
+                # Copy for Claude Project (uses raw markdown)
                 self._copy_for_claude_project(prompt_data)
                 break
             elif action == fav_icon or action == "star" or action == "fav":
@@ -958,21 +1019,39 @@ class PromptManager:
 
     def _delete_prompt(self, prompt_data):
         """Delete a prompt with confirmation"""
-        title = prompt_data.get("title", "Unknown")
+        from rich import box
+        from rich.panel import Panel
 
-        if confirm_action(f"Are you sure you want to delete '{title}'?", default="n"):
-            # Find and delete the file
+        from utils.cli_helpers import console
+
+        title = prompt_data.get("title", "Unknown")
+        category = prompt_data.get("category", "general")
+
+        # Show warning panel
+        warning = "[bold red]⚠️  Delete Prompt[/bold red]\n\n"
+        warning += f"Title: {title}\n"
+        warning += f"Category: {category}\n\n"
+        warning += "[yellow]This action cannot be undone![/yellow]"
+
+        panel = Panel(warning, border_style="red", box=box.DOUBLE)
+        console.print(panel)
+
+        if confirm_action(f"Delete '{title}'?", default="n"):
             filepath = prompt_data.get("_filepath")
             if filepath and os.path.exists(filepath):
                 try:
                     os.remove(filepath)
                     print_status(f"Deleted '{title}'", "success")
+                    return True
                 except Exception as e:
                     print_status(f"Error deleting file: {e}", "error")
+                    return False
             else:
                 print_status("Could not locate file to delete", "error")
+                return False
         else:
             print_status("Deletion cancelled", "info")
+            return False
 
     def _change_privacy_setting(self, prompt_data):
         """Change privacy setting for a prompt"""
@@ -1087,6 +1166,102 @@ class PromptManager:
             print_status(f"{action} favorites: '{title}' ⭐", "success")
         else:
             print_status(f"Failed to update favorite status for '{title}'", "error")
+
+    def _edit_prompt_metadata(self, prompt_data):
+        """Edit prompt metadata (title, category, tags, privacy, description)"""
+        from rich import box
+        from rich.panel import Panel
+
+        from utils.cli_helpers import console
+
+        console.print("\n[bold cyan]📝 Edit Prompt Metadata[/bold cyan]")
+        console.print("─" * 70)
+
+        # Show current values in a panel
+        current = "[bold]Current Values:[/bold]\n\n"
+        current += f"Title: {prompt_data.get('title', 'Untitled')}\n"
+        current += f"Category: {prompt_data.get('category', 'general')}\n"
+        tags = prompt_data.get("tags", [])
+        current += f"Tags: {', '.join(tags) if tags else 'None'}\n"
+        current += f"Privacy: {'Private' if prompt_data.get('private') else 'Public'}\n"
+        desc = prompt_data.get("description", "")
+        current += f"Description: {desc if desc else 'None'}"
+
+        panel = Panel(current, border_style="blue", box=box.ROUNDED)
+        console.print(panel)
+
+        console.print("\n[dim]Press Enter to keep current value[/dim]\n")
+
+        # Edit title - show current value, use standard input
+        console.print(f"[cyan]Title:[/cyan] {prompt_data.get('title', 'Untitled')}")
+        new_title = input("  New value (or Enter to keep): ").strip()
+        if new_title:
+            prompt_data["title"] = new_title
+
+        # Edit category
+        console.print(
+            f"\n[cyan]Category:[/cyan] {prompt_data.get('category', 'general')}"
+        )
+        new_category = input("  New value (or Enter to keep): ").strip()
+        if new_category:
+            prompt_data["category"] = new_category
+
+        # Edit tags
+        current_tags_str = ", ".join(prompt_data.get("tags", []))
+        console.print(
+            f"\n[cyan]Tags (comma-separated):[/cyan] {current_tags_str if current_tags_str else 'None'}"
+        )
+        new_tags = input("  New value (or Enter to keep): ").strip()
+        if new_tags:
+            prompt_data["tags"] = [
+                tag.strip() for tag in new_tags.split(",") if tag.strip()
+            ]
+
+        # Edit privacy with choices
+        current_privacy = "Private" if prompt_data.get("private") else "Public"
+        console.print(f"\n[cyan]Privacy:[/cyan] {current_privacy}")
+        console.print("  Options: [1] Public  [2] Private")
+        privacy_choice = input("  Choose (1/2 or Enter to keep): ").strip()
+
+        old_is_private = prompt_data.get("private", False)
+
+        if privacy_choice == "1":
+            prompt_data["private"] = False
+        elif privacy_choice == "2":
+            prompt_data["private"] = True
+        # Else keep current value
+
+        # Edit description
+        current_desc = prompt_data.get("description", "")
+        console.print(
+            f"\n[cyan]Description:[/cyan] {current_desc if current_desc else 'None'}"
+        )
+        new_desc = input("  New value (or Enter to keep): ").strip()
+        if new_desc:
+            prompt_data["description"] = new_desc
+
+        # Confirm changes
+        console.print()
+        if confirm_action("Save changes?", default="y"):
+            filepath = prompt_data.get("_filepath")
+            if filepath:
+                new_is_private = prompt_data["private"]
+
+                if old_is_private != new_is_private:
+                    # Privacy changed - need to move file
+                    return self._move_prompt_privacy(prompt_data, new_is_private)
+                else:
+                    # Just update the file in place
+                    if save_prompt_to_file(prompt_data, filepath):
+                        print_status("Prompt updated successfully!", "success")
+                        return True
+                    else:
+                        print_status("Failed to save changes", "error")
+                        return False
+            return False
+        else:
+            print_status("Changes cancelled", "info")
+            return False
 
 
 if __name__ == "__main__":

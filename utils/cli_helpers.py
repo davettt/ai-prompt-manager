@@ -1,32 +1,55 @@
 #!/usr/bin/env python3
 """
-Enhanced CLI Helper Functions
-Professional terminal interface patterns from the automation template
+Enhanced CLI Helper Functions using Rich
+Professional terminal interface with consistent formatting
 """
+
+from rich import box
+from rich.console import Console
+from rich.panel import Panel
+from rich.prompt import Confirm, Prompt
+from rich.table import Table
+
+# Global console instance
+console = Console()
 
 
 def print_header(title, subtitle=None, width=60):
-    """Print a formatted header"""
-    print("\n" + "=" * width)
-    print(title)
-    print("=" * width)
+    """Print a formatted header with Rich"""
     if subtitle:
-        print(subtitle)
-        print()
+        panel = Panel(
+            f"[bold]{title}[/bold]\n{subtitle}", border_style="blue", box=box.DOUBLE
+        )
+    else:
+        panel = Panel(f"[bold]{title}[/bold]", border_style="blue", box=box.DOUBLE)
+    console.print(panel)
 
 
 def print_section(title, width=50):
-    """Print a section divider"""
-    print("\n" + "-" * width)
-    print(title)
-    print("-" * width)
+    """Print a section divider with Rich"""
+    console.print(f"\n[bold cyan]{title}[/bold cyan]")
+    console.print("─" * width, style="dim")
+
+
+def print_status(message, status_type="info"):
+    """Print status messages with Rich styling"""
+    styles = {
+        "success": "[bold green]✅",
+        "error": "[bold red]❌",
+        "warning": "[bold yellow]⚠️",
+        "info": "[bold blue]ℹ️",
+        "processing": "[bold cyan]🔄",
+    }
+
+    style = styles.get(status_type, "•")
+    console.print(f"{style} {message}")
 
 
 def show_menu_options(options):
     """Display menu options in consistent format"""
-    print("\nOptions:")
+    console.print("\n[bold cyan]Options:[/bold cyan]")
     for i, option in enumerate(options, 1):
-        print(f"[{i}] {option}")
+        console.print(f"[{i}] {option}")
 
 
 def get_user_choice(options, prompt="Select option"):
@@ -39,7 +62,7 @@ def get_user_choice(options, prompt="Select option"):
 
             # Handle empty input
             if not choice:
-                print("❌ Please enter a number to make your selection.")
+                print_status("Please enter a number to make your selection.", "error")
                 continue
 
             # Try to convert to integer
@@ -48,93 +71,90 @@ def get_user_choice(options, prompt="Select option"):
             if 0 <= index < max_choice:
                 return index
             else:
-                print(f"❌ Invalid choice. Please select 1-{max_choice}.")
+                print_status(f"Invalid choice. Please select 1-{max_choice}.", "error")
 
         except KeyboardInterrupt:
-            print("\n\n👋 Operation cancelled by user. Goodbye!")
+            console.print(
+                "\n\n👋 Operation cancelled by user. Goodbye!", style="bold yellow"
+            )
             raise KeyboardInterrupt()  # Re-raise to propagate up
         except ValueError:
-            print(f"❌ Please enter a valid number between 1 and {max_choice}.")
+            print_status(
+                f"Please enter a valid number between 1 and {max_choice}.", "error"
+            )
 
 
 def confirm_action(message, default="n"):
-    """Get user confirmation for destructive actions"""
-    choices = "y/N" if default.lower() == "n" else "Y/n"
-    response = input(f"{message} ({choices}): ").strip().lower()
-
-    if not response:
-        return default.lower() == "y"
-
-    return response in ["y", "yes"]
+    """Get user confirmation with Rich prompt"""
+    default_bool = default.lower() == "y"
+    return Confirm.ask(message, default=default_bool)
 
 
-def print_status(message, status_type="info"):
-    """Print status messages with consistent formatting"""
-    icons = {
-        "success": "✅",
-        "error": "❌",
-        "warning": "⚠️",
-        "info": "ℹ️",
-        "processing": "🔄",
-    }
-
-    icon = icons.get(status_type, "•")
-    print(f"{icon} {message}")
+def get_input(prompt_text, default=None):
+    """Get user input with Rich prompt"""
+    if default:
+        return Prompt.ask(prompt_text, default=default)
+    return Prompt.ask(prompt_text)
 
 
-def display_header(title):
-    """Display a formatted header"""
-    print_header(title)
+def display_table(headers, rows, title=None):
+    """Display data in Rich table format"""
+    table = Table(title=title, box=box.ROUNDED)
 
+    for header in headers:
+        table.add_column(header, style="cyan", no_wrap=False)
 
-def display_section(title):
-    """Display a section divider"""
-    print_section(title)
-
-
-def display_table(headers, rows, max_width=100):
-    """Display data in table format with proper spacing"""
-    if not rows:
-        print("No data to display")
-        return
-
-    # Calculate column widths
-    col_widths = [len(header) for header in headers]
     for row in rows:
-        for i, cell in enumerate(row):
-            if i < len(col_widths):
-                col_widths[i] = max(col_widths[i], len(str(cell)))
+        table.add_row(*[str(cell) for cell in row])
 
-    # Adjust widths to fit max_width if needed
-    total_width = sum(col_widths) + len(headers) * 3 - 1
-    if total_width > max_width:
-        excess = total_width - max_width
-        # Reduce longest columns first
-        while excess > 0 and max(col_widths) > 10:
-            longest_idx = col_widths.index(max(col_widths))
-            col_widths[longest_idx] -= 1
-            excess -= 1
+    console.print(table)
 
-    # Print header
-    header_row = " | ".join(
-        header.ljust(width) for header, width in zip(headers, col_widths)
-    )
-    print(f"\n{header_row}")
-    print("-" * len(header_row))
 
-    # Print rows
-    for row in rows:
-        data_row = " | ".join(
-            str(cell)[:width].ljust(width) for cell, width in zip(row, col_widths)
-        )
-        print(data_row)
+def display_prompt_summary(prompt_data):
+    """Display a formatted prompt summary with Rich"""
+    title = prompt_data.get("title", "Untitled")
+    category = prompt_data.get("category", "general")
+    privacy = "Private 🔒" if prompt_data.get("private", False) else "Public 🌐"
 
-    print()
+    # Build summary text
+    summary = f"[bold]{title}[/bold]\n\n"
+    summary += f"📁 Category: {category}\n"
+    summary += f"{privacy}\n"
+
+    tags = prompt_data.get("tags", [])
+    if tags:
+        summary += f"🏷️  Tags: {', '.join(tags)}\n"
+
+    # Discovery info
+    discovery = prompt_data.get("discovery", {})
+    if discovery:
+        summary += "\n[bold cyan]💡 Discovery[/bold cyan]\n"
+        if discovery.get("purpose"):
+            summary += f"  Purpose: {discovery['purpose']}\n"
+        if discovery.get("try_if"):
+            summary += f"  Try if: {discovery['try_if']}\n"
+
+    # Technical info
+    tech = prompt_data.get("technical_notes", {})
+    if tech and any(tech.values()):
+        summary += "\n[bold cyan]🔧 Technical[/bold cyan]\n"
+        if tech.get("recommended_llm"):
+            summary += f"  LLM: {tech['recommended_llm']}\n"
+        if tech.get("temperature") is not None:
+            summary += f"  Temperature: {tech['temperature']}\n"
+
+    panel = Panel(summary, border_style="green", box=box.ROUNDED)
+    console.print(panel)
+
+
+# Keep backwards compatibility
+display_header = print_header
+display_section = print_section
 
 
 def handle_keyboard_interrupt():
     """Handle Ctrl+C gracefully"""
-    print("\n\n👋 Operation cancelled by user. Goodbye!")
+    console.print("\n\n👋 Operation cancelled by user. Goodbye!", style="bold yellow")
     return None
 
 
@@ -147,70 +167,3 @@ def validate_input(prompt, validator_func, error_message="Invalid input"):
             return user_input
         else:
             print_status(error_message, "error")
-
-
-def display_prompt_summary(prompt_data):
-    """Display a formatted prompt summary with discovery info"""
-    print(f"\n📝 {prompt_data.get('title', 'Untitled')}")
-    print(f"📁 Category: {prompt_data.get('category', 'general')}")
-
-    tags = prompt_data.get("tags", [])
-    if tags and isinstance(tags, list):
-        print(f"🏷️  Tags: {', '.join(str(tag) for tag in tags)}")
-
-    privacy = "Private" if prompt_data.get("private", False) else "Public"
-    print(f"🔒 Privacy: {privacy}")
-
-    # Discovery information - NEW!
-    discovery = prompt_data.get("discovery", {})
-    if discovery and isinstance(discovery, dict):
-        print("\n💡 Discovery Information:")
-
-        if discovery.get("purpose"):
-            print(f"   • Purpose: {discovery['purpose']}")
-
-        if discovery.get("best_for"):
-            best_for = discovery["best_for"]
-            if isinstance(best_for, list):
-                print(f"   • Best for: {', '.join(best_for)}")
-            else:
-                print(f"   • Best for: {best_for}")
-
-        if discovery.get("session_length"):
-            print(f"   • Session length: {discovery['session_length']}")
-
-        if discovery.get("interaction_style"):
-            print(f"   • Style: {discovery['interaction_style']}")
-
-        if discovery.get("outcome"):
-            print(f"   • Outcome: {discovery['outcome']}")
-
-        if discovery.get("try_if"):
-            print(f"   • Try if: {discovery['try_if']}")
-
-    # Technical details - handle None values safely
-    tech = prompt_data.get("technical_notes", {})
-    if (
-        tech
-        and isinstance(tech, dict)
-        and any(v for v in tech.values() if v is not None)
-    ):
-        print("\n🔧 Technical:")
-        if tech.get("recommended_llm"):
-            print(f"   • LLM: {tech['recommended_llm']}")
-        if tech.get("temperature") is not None:
-            print(f"   • Temperature: {tech['temperature']}")
-        if tech.get("max_tokens"):
-            print(f"   • Max Tokens: {tech['max_tokens']}")
-
-    # Content preview
-    content = prompt_data.get("content", "")
-    preview_length = 200
-    if len(content) > preview_length:
-        preview = content[:preview_length] + "..."
-    else:
-        preview = content
-
-    print("\n📄 Content Preview:")
-    print(f"   {preview}")
-    print()

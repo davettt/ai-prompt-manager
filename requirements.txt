@@ -6,10 +6,10 @@ python-dotenv>=0.19.0
 
 # CLI enhancements
 pyperclip>=1.8.2
+rich>=13.0.0     # Enhanced CLI formatting and markdown rendering
 
 # Optional but recommended for better user experience
 # colorama>=0.4.4  # Cross-platform colored terminal text
-# rich>=10.0.0     # Enhanced CLI formatting (uncomment if needed)
 
 # Development dependencies (uncomment for development)
 # pytest>=6.0.0

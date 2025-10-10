@@ -16,6 +16,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - (Future changes go here)
 
+## [1.3.0] - 2025-10-09
+
+### Added
+- **Rich Markdown Rendering**: Beautiful formatted display when viewing full prompts
+  - Headers, bold, lists, and code blocks render properly
+  - Raw markdown preserved for clipboard and Claude Project exports
+  - Graceful fallback if Rich not installed
+- **Delete Command**: Remove prompts directly from browser with `[number]d`
+  - Confirmation dialog with warning panel
+  - File removed from disk safely
+- **Edit Command**: Modify prompt metadata with `[number]e`
+  - Edit title, category, tags, privacy, and description
+  - Clear display of current values
+  - Privacy changes automatically move files between public/private
+- **Readline Support**: Arrow keys now work properly when entering prompts
+  - Navigate and edit text naturally during input
+  - Standard text editor behavior
+
+### Changed
+- Consistent Rich formatting for headers and panels
+- Edit input uses standard input() for better UX (no backspace issues)
+- Browse commands section includes new delete and edit options
+
+### Fixed
+- Backspace no longer deletes prompt labels during edit
+- Input fields work naturally with arrow keys and standard keyboard shortcuts
+
 ## [1.2.0] - 2025-10-09
 
 ### Added
@@ -114,6 +141,7 @@ Changes that require users to modify their workflow or data structure are marked
 
 ---
 
+[1.3.0]: https://github.com/[username]/ai-prompt-manager/releases/tag/v1.3.0
 [1.2.0]: https://github.com/[username]/ai-prompt-manager/releases/tag/v1.2.0
 [1.1.0]: https://github.com/[username]/ai-prompt-manager/releases/tag/v1.1.0
 [1.0.0]: https://github.com/[username]/ai-prompt-manager/releases/tag/v1.0.0
