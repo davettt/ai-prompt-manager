@@ -36,3 +36,9 @@ repos:
         args: ['--maxkb=1000']
       - id: check-json
       - id: check-merge-conflict
+      - id: detect-private-key          # Prevents committing SSH/GPG keys
+      - id: check-case-conflict          # Cross-platform filename safety
+      - id: check-toml                   # Validates pyproject.toml syntax
+      - id: check-ast                    # Validates Python syntax
+      - id: mixed-line-ending            # Ensures consistent line endings
+        args: ['--fix=lf']

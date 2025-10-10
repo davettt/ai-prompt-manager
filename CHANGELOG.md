@@ -8,11 +8,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- (Future changes go here)
+
+### Changed
+- (Future changes go here)
+
+### Fixed
+- (Future changes go here)
+
+## [1.2.0] - 2025-10-09
+
+### Added
 - Development tools: Black (formatter), Ruff (linter), mypy (type checker)
 - Security scanning with bandit
 - Pre-commit hooks for automatic code quality checks
+- Additional pre-commit hooks for enhanced safety:
+  - detect-private-key (prevents committing SSH/GPG keys)
+  - check-case-conflict (cross-platform filename safety)
+  - check-toml (validates pyproject.toml syntax)
+  - check-ast (validates Python syntax)
+  - mixed-line-ending (ensures consistent line endings)
 - Tool configuration in pyproject.toml
 - Development dependencies in requirements-dev.txt
+- Complete .claude/ structure with project guide and workflow documentation
 
 ### Changed
 - Code formatted with Black for consistency
@@ -96,5 +114,6 @@ Changes that require users to modify their workflow or data structure are marked
 
 ---
 
+[1.2.0]: https://github.com/[username]/ai-prompt-manager/releases/tag/v1.2.0
 [1.1.0]: https://github.com/[username]/ai-prompt-manager/releases/tag/v1.1.0
 [1.0.0]: https://github.com/[username]/ai-prompt-manager/releases/tag/v1.0.0
