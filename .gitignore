@@ -24,6 +24,9 @@ current_*.json
 *_reference.json
 *_config.json
 
+# Claude AI personal context and workflow
+.claude/
+
 # Operation files (temporary)
 processed/
 archive/
@@ -123,6 +126,11 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+
+# Development tool caches
+.ruff_cache/
+.mypy_cache/
+htmlcov/
 
 # Documentation builds
 docs/_build/

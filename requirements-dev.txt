@@ -1,0 +1,20 @@
+# Development Dependencies for ai-prompt-manager
+# Install with: pip install -r requirements-dev.txt
+
+# Code Quality Tools
+black>=24.0.0        # Code formatter (opinionated, consistent)
+ruff>=0.1.0          # Fast linter (replaces flake8, pylint, isort)
+mypy>=1.0.0          # Type checker (optional - validates type hints)
+
+# Security Tools
+bandit>=1.7.0        # Security linter (finds common vulnerabilities)
+
+# Pre-commit Hooks
+pre-commit>=3.0.0    # Automated checks before commits
+
+# Testing Tools (for future use)
+pytest>=7.0.0        # Testing framework
+pytest-cov>=4.0.0    # Coverage reporting
+
+# Note: These are only needed for development
+# Production deployments only need requirements.txt
