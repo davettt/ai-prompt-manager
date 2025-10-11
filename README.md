@@ -1,181 +1,292 @@
 # AI Prompt Manager
 
-*Professional-grade prompt storage and retrieval system with intelligent metadata extraction and privacy-first architecture*
+*Store, organize, and retrieve your AI prompts with intelligent metadata extraction and privacy-first architecture.*
 
-## Features
+**Current Version:** v1.0.0 | [Changelog](CHANGELOG.md)
 
-✅ **Intelligent Metadata Extraction**: Auto-detects titles, categories, and technical specs using Claude AI
-✅ **Privacy-First Architecture**: Secure separation of public and private prompts
-✅ **Content Preservation**: Never modifies your carefully crafted prompts
-✅ **Smart Organization**: Automatic categorization and workflow optimization
-✅ **Professional CLI Interface**: Enhanced table displays and interactive views
-✅ **Favorites System**: Star your most-used prompts for quick access
-✅ **Claude Project Export**: One-click formatting for Claude Projects
-✅ **Smart Search**: OR logic with relevance scoring for better discovery
+---
+
+## What It Does
+
+- 💾 **Store prompts safely** - Never lose your carefully crafted prompts again
+- 🤖 **AI metadata extraction** - Claude automatically categorizes and tags your prompts
+- 🔒 **Privacy-first** - Separate public (shareable) and private (personal) prompts
+- ⭐ **Favorites system** - Star your most-used prompts for quick access
+- 🔍 **Smart search** - Find prompts by keyword, category, or tags
+- 📋 **Claude Project export** - One-click formatting for Claude Projects
+
+---
 
 ## Quick Start
 
-### Prerequisites
-- Python 3.7+
-- Anthropic API access (claude.ai)
-- Git (for version control)
+**Want to try it right now?**
 
-### Installation
 ```bash
-git clone [YOUR_REPO_URL]
+# 1. Clone and install
+git clone <repo-url>
 cd ai-prompt-manager
 pip install -r requirements.txt
+
+# 2. Set up API key
 cp .env.example .env
-# Add your ANTHROPIC_API_KEY to .env
+# Add: ANTHROPIC_API_KEY=your-key-here
+
+# 3. Run
 python main.py
 ```
 
-## Development
+**That's it!** See [Installation](#installation) for detailed setup.
 
-### Setting Up Development Environment
+---
 
-For contributors or local development:
+## Installation
+
+### Prerequisites
+
+Before installing, make sure you have:
+- **Python 3.7 or newer** ([Check version](https://www.python.org/downloads/): `python3 --version`)
+- **pip** (usually comes with Python)
+- **Anthropic API key** ([Get one here](https://console.anthropic.com/) - paid service)
+
+### Step 1: Clone the Repository
 
 ```bash
-# Install development dependencies
-pip install -r requirements-dev.txt
+git clone <repo-url>
+cd ai-prompt-manager
+```
 
-# Set up pre-commit hooks (runs checks automatically)
+### Step 2: Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+**What this installs:** Python packages for Claude AI integration, CLI interface, etc.
+
+### Step 3: Configure API Key
+
+```bash
+# Copy the example file
+cp .env.example .env
+
+# Edit .env and add your Anthropic API key:
+# ANTHROPIC_API_KEY=sk-ant-...
+```
+
+Get an API key from [Anthropic's Console](https://console.anthropic.com/).
+
+### Step 4: First Run
+
+```bash
+python main.py
+```
+
+**Expected result:** You'll see a menu to add, search, or browse prompts.
+
+### Troubleshooting Installation
+
+**Python not found?**
+- Install from [python.org](https://www.python.org/downloads/)
+- Try `python3` instead of `python`
+
+**"No module named 'anthropic'" or similar?**
+- Install dependencies: `pip install -r requirements.txt`
+- Make sure you're in the ai-prompt-manager directory
+
+**API key not working?**
+- Check `.env` file format: `ANTHROPIC_API_KEY=sk-ant-...` (no quotes, no spaces)
+- Get a new token from [console.anthropic.com](https://console.anthropic.com/)
+
+---
+
+## How to Use
+
+### Main Menu
+
+```bash
+python main.py
+```
+
+You'll see options to:
+- **Add new prompt** - Paste a prompt, AI extracts metadata
+- **Browse prompts** - See your entire library with inline filtering
+- **Search prompts** - Opens browser with search filter applied
+- **Exit**
+
+### Example Workflow
+
+**1. Add a prompt:**
+```bash
+python main.py
+# Choose: Add new prompt
+# Paste your prompt
+```
+
+**AI analyzes and suggests:**
+- Title: "Elite Strategic Performance Advisor"
+- Category: "Business Strategy"
+- Privacy: "Private" (contains personal info)
+- Tags: coaching, performance, strategy
+
+**2. Star it as favorite:**
+```bash
+# In search/browse view
+# Type: [number]fav
+```
+
+**3. Export to Claude Project:**
+```bash
+# Type: [number]p
+# Copies formatted prompt to clipboard
+```
+
+---
+
+## Common Tasks
+
+### Adding Your First Prompt
+
+```bash
+python main.py
+# Choose: Add new prompt
+# Paste your prompt text
+# AI suggests title, category, privacy level
+# Review and confirm
+```
+
+### Browsing and Filtering Prompts
+
+```bash
+python main.py
+# Choose: Browse prompts
+```
+
+**In the browser, you can:**
+- Press `[number]` to expand/collapse details
+- Type text to filter (smart OR logic, relevance scored)
+- Type `favorites` or `⭐` to see only starred prompts
+- Type `private` to see only private prompts
+- Type `public` to see only public prompts
+- Type `x` to clear current filter
+
+### Searching for Prompts
+
+```bash
+python main.py
+# Choose: Search prompts
+# Enter keywords
+# Browser opens with filter applied
+```
+
+**Search opens the browser with your search already filtered!**
+
+### Viewing and Managing Favorites
+
+```bash
+# In browse view:
+# Type: favorites  (or ⭐)
+# Shows only starred prompts
+```
+
+**To star/unstar:**
+```bash
+# [number]fav    - Star a prompt
+# [number]unfav  - Unstar a prompt
+```
+
+**Favorites are marked with ⭐ in all lists**
+
+### Exporting to Claude Projects
+
+```bash
+# In browse view:
+# Type: [number]p
+# Formatted prompt copied to clipboard
+# Paste into Claude Project custom instructions
+```
+
+### Editing Prompt Metadata
+
+```bash
+# In browse view:
+# Type: [number]e
+# Edit title, category, tags, privacy, description
+```
+
+---
+
+## Requirements
+
+- Python 3.7 or newer
+- Anthropic API key (paid service for AI analysis)
+
+---
+
+## Data Storage & Privacy
+
+- 🏠 **Your prompts stay local** in `prompts/` folder
+  - `prompts/public/` - Git tracked, shareable prompts
+  - `prompts/private/` - Git ignored, personal prompts only
+- 🔒 **API keys** stored in `.env` file (never committed to git)
+- 🤖 **AI analysis** only for metadata extraction (title, category, tags)
+- 🚫 **No cloud storage** of your prompts
+- ✅ **Open source** - review all code yourself
+
+**Your private files:**
+- `prompts/private/` - Your personal prompts
+- `.env` - Your API key
+- Both are automatically excluded from git
+
+---
+
+## Usage & Forking
+
+This project is open source under MIT license. You're welcome to:
+- **Fork the repository** and customize for your own needs
+- **Report bugs** via GitHub issues
+- **Suggest improvements** in discussions
+
+*Note: This is a personal productivity system. While the code is open source, I keep contributions minimal to maintain system stability for personal use.*
+
+### For Developers (Forking/Customization)
+
+If you've forked this project and want to modify it, see:
+- **[.claude/README.md](.claude/README.md)** - Claude Code integration guide
+- **[CLAUDE_CONTEXT.md](CLAUDE_CONTEXT.md)** - Technical documentation
+
+**Quick fork setup:**
+```bash
+git clone <your-fork-url>
+cd ai-prompt-manager
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+# Install dev tools
+pip install -r requirements-dev.txt
 pre-commit install
 ```
 
-### Code Quality Tools
+---
 
-This project uses:
-- **Black** - Code formatting
-- **Ruff** - Fast linting
-- **Bandit** - Security scanning
-- **Pre-commit** - Automatic checks before commits
+## Support
 
-Tools run automatically on commit. To run manually:
-```bash
-python3 -m black .
-python3 -m ruff check . --fix
-python3 -m bandit -r . -c pyproject.toml
-```
+- 📖 **Questions?** Check the [Common Tasks](#common-tasks) section above
+- 📚 **Quick setup?** See [USER_START.md](USER_START.md)
+- 🐛 **Found a bug?** Open an issue on GitHub
+- 💡 **Have an idea?** Start a discussion
 
-## How It Works
+---
 
-1. **Add Complete Prompts**: Paste your optimized prompts into the system
-2. **AI Analysis**: Claude extracts metadata, suggests categories, analyzes privacy
-3. **Smart Organization**: Automatic categorization with public/private separation
-4. **Easy Retrieval**: Search, browse, and copy prompts with professional interface
-5. **Quick Access**: Star favorites and export to Claude Projects
+## Advanced
 
-## Example Workflow
+### Rich Metadata Storage
 
-**You:** Paste a complex coaching prompt into the system
-
-**Claude AI:** Analyzes content and suggests:
-- Title: "Elite Strategic Performance Advisor"
-- Category: "Business Strategy"
-- Privacy: "Private" (contains personal coaching elements)
-- Technical notes: "Claude 3.5 Sonnet, Temperature 0.4"
-
-**System:** Saves to appropriate folder with rich metadata for easy retrieval
-
-**You:** Star it as a favorite ⭐ and export to Claude Project with one command
-
-## Key Features
-
-### 🔍 Smart Search & Browse
-- **OR logic search**: Matches ANY term, not all terms required
-- **Relevance scoring**: Most relevant prompts appear first
-- **Inline expansion**: Press number to toggle detailed info
-- **Filter by favorites**: Quick access with `⭐` or "favorites" filter
-
-### ⭐ Favorites System
-- Star your most-used prompts for quick access
-- Toggle with `[number]fav` or `[number]unfav` commands
-- Filter to show only favorites
-- Persistent across sessions
-
-### 🚀 Claude Project Export
-- One-click export to Claude Projects format
-- Command: `[number]p` after selecting a prompt
-- Properly formatted with instructions
-- Copies directly to clipboard
-
-### 🔒 Privacy First
-- Public/private separation at file system level
-- AI-powered privacy analysis
-- Git-ignored private directory
-- Easy privacy changes with warnings
-
-## Using with Claude
-
-**Start any Claude conversation with:**
-```
-I have an AI Prompt Manager system. Please read the documentation files in this folder:
-
-/path/to/ai-prompt-manager
-
-The system stores and organizes prompts with intelligent metadata extraction.
-```
-
-## Core Commands
-
-```bash
-# Main interface (primary way to use the system)
-python main.py
-
-# Test metadata extraction
-python metadata_extractor.py
-```
-
-## Project Structure
-
-```
-ai-prompt-manager/
-├── README.md                    # This file
-├── CHANGELOG.md                # Version history
-├── USER_START.md               # Quick setup guide
-├── main.py                     # Entry point
-├── prompt_manager.py           # Core functionality
-├── metadata_extractor.py       # Claude AI integration
-├── utils/                      # Shared utilities
-│   ├── cli_helpers.py         # Enhanced CLI patterns
-│   └── file_helpers.py        # File operations
-├── prompts/                   # Prompt library
-│   ├── public/               # Git tracked, shareable
-│   └── private/              # Git ignored, personal
-├── .env.example             # Environment template
-└── CLAUDE_CONTEXT.md        # Technical documentation
-```
-
-## Privacy & Security Architecture
-
-```
-prompts/
-├── public/          # Git tracked, shared prompts
-│   ├── business/
-│   ├── technical/
-│   └── creative/
-└── private/         # Git ignored, personal prompts
-    ├── personal/
-    └── confidential/
-```
-
-### Privacy Protection
-- 🔒 **Private prompts** completely excluded from git via `.gitignore`
-- 🏠 **Personal data** stays on your machine only
-- 🤖 **AI privacy analysis** suggests public/private based on content
-- ✅ **Content preservation** - no AI modification of your prompt content
-- 🚫 **No cloud storage** of sensitive prompt information
-
-## Rich Metadata Storage
-
-Each prompt includes:
+Each prompt includes comprehensive metadata:
 ```json
 {
   "id": "uuid",
   "title": "Elite Strategic Performance Advisor",
-  "content": "Original prompt content (never modified)",
+  "content": "Original prompt (never modified by AI)",
   "category": "business_strategy",
   "tags": ["coaching", "performance", "strategy"],
   "private": false,
@@ -183,56 +294,85 @@ Each prompt includes:
   "description": "Systems-level performance acceleration",
   "technical_notes": {
     "recommended_llm": "Claude 3.5 Sonnet",
-    "temperature": 0.4,
-    "max_tokens": "4000-6000"
-  },
-  "ai_analysis": {
-    "complexity_level": "advanced",
-    "privacy_reasoning": "Professional methodology, safe to share"
+    "temperature": 0.4
   }
 }
 ```
 
-## Usage & Forking
+### Privacy Architecture
 
-This project is open source under MIT license. You're welcome to:
-- **Fork the repository** and customize for your needs
-- **Report bugs** via GitHub issues
-- **Suggest improvements** in discussions
+```
+prompts/
+├── public/          # Git tracked - safe to share
+│   ├── business/
+│   ├── technical/
+│   └── creative/
+└── private/         # Git ignored - your personal prompts
+    ├── personal/
+    └── confidential/
+```
 
-*Note: This is a personal productivity system. While the code is open source, I keep contributions minimal to maintain system stability.*
+### Search Features
 
-## Roadmap
+- **OR logic**: Matches ANY keyword (not all required)
+- **Relevance scoring**: Best matches appear first
+- **Inline expansion**: Press [number] to toggle details
+- **Filter by favorites**: Type "favorites" to see only starred
 
-- [x] Core prompt storage and metadata extraction
-- [x] Privacy-first architecture with public/private separation
-- [x] Professional CLI interface with search functionality
-- [x] Favorites system for quick access to most-used prompts
-- [x] Enhanced search with OR logic and relevance scoring
-- [x] Claude Project export functionality
-- [ ] Usage analytics and prompt effectiveness tracking
-- [ ] Bulk import/export capabilities for sharing prompt collections
-- [ ] Prompt versioning and history
-- [ ] Advanced filtering and tag management
+### CLI Commands
 
-## Important Disclaimers
+**In the browser:**
+- `[number]` - Toggle inline expansion (show/hide details)
+- `[number]f` - Show full prompt content
+- `[number]c` - Copy prompt to clipboard
+- `[number]p` - Export to Claude Project format
+- `[number]fav` - Star as favorite
+- `[number]unfav` - Remove from favorites
+- `[number]e` - Edit metadata (title, category, tags, privacy, description)
+- `[number]d` - Delete prompt
+- `favorites` or `⭐` - Filter to favorites only
+- `private` - Filter to private prompts only
+- `public` - Filter to public prompts only
+- `x` - Clear current filter
+- `q` - Exit browser
 
-⚠️  **Use at your own risk:** This software is provided "as is" without warranty. Users are responsible for:
-- Securing API tokens and personal data
-- Testing with non-critical prompts first
-- Understanding the privacy implications of public vs private prompts
-- Regular backups of important prompt data
+### Project Structure
 
-**No warranty provided.** The author is not responsible for any data loss, API quota exhaustion, or unintended prompt modifications.
+```
+ai-prompt-manager/
+├── main.py                     # Start here
+├── prompt_manager.py           # Core functionality
+├── metadata_extractor.py       # AI analysis
+├── utils/                      # Helper functions
+├── prompts/
+│   ├── public/                # Shareable prompts
+│   └── private/               # Personal prompts
+└── .env                       # Your API key
+```
 
-## Support
+### Roadmap
 
-- 📖 Read USER_START.md for quick setup
-- 📋 Check CHANGELOG.md for version history
-- 📋 Check CLAUDE_CONTEXT.md for technical details
-- 🐛 Report issues on GitHub
-- 💡 Suggest features in discussions
+**✅ Current (v1.0.0):**
+- Core prompt storage and metadata extraction
+- Privacy-first architecture
+- Favorites system
+- Search and browse
+- Claude Project export
+
+**🚀 Next:**
+- Usage analytics
+- Bulk import/export
+- Prompt versioning
+- Advanced filtering
 
 ---
 
-*Supercharge your AI productivity with intelligent prompt management!*
+## License
+
+MIT License - See [LICENSE](LICENSE) for details.
+
+---
+
+**Version:** v1.0.0 | **Last updated:** 2025-10-12
+
+**Ready to organize your prompts?** Run `python main.py` 🚀
