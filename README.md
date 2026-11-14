@@ -1,5 +1,7 @@
 # AI Prompt Manager
 
+> **Not currently maintained.** I'm not using or developing this app at the moment. I may pick it up again in future, so the code stays here. Until then, issues and pull requests may go unanswered.
+
 *Store, organize, and retrieve your AI prompts with intelligent metadata extraction and privacy-first architecture.*
 
 **Current Version:** v1.0.0 | [Changelog](CHANGELOG.md)
